@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>企画書 ｜ ベランダ家庭菜園入門セミナー</title>
+<style>
+  :root {
+    --navy:   #16365C;
+    --gold:   #F4A300;
+    --bg:     #FBF8F1;
+    --white:  #FFFFFF;
+    --text:   #2D2D2D;
+    --muted:  #5A6370;
+    --shadow: 0 4px 16px rgba(22,54,92,.10);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans JP",
+                 "Meiryo", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* ── header ── */
+  header {
+    background: var(--navy);
+    padding: 48px 32px 40px;
+    text-align: center;
+  }
+  .header-label {
+    display: inline-block;
+    border: 1.5px solid var(--gold);
+    color: var(--gold);
+    font-size: 11px;
+    letter-spacing: .15em;
+    padding: 3px 14px;
+    border-radius: 20px;
+    margin-bottom: 18px;
+  }
+  header h1 {
+    color: var(--white);
+    font-size: clamp(22px, 4vw, 34px);
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 12px;
+  }
+  .catchcopy {
+    color: var(--gold);
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: .05em;
+  }
+
+  /* ── main ── */
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 20px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+  }
+
+  /* ── card ── */
+  .card {
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 32px 36px;
+  }
+
+  /* ── section heading ── */
+  .section-heading {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+  .badge {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    background: var(--gold);
+    border-radius: 50%;
+    color: var(--white);
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .section-heading h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+
+  /* ── overview table ── */
+  .overview-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14.5px;
+  }
+  .overview-table tr:not(:last-child) td {
+    border-bottom: 1px solid #EDE9E0;
+  }
+  .overview-table td {
+    padding: 12px 16px;
+    vertical-align: top;
+  }
+  .overview-table td:first-child {
+    width: 38%;
+    font-weight: 600;
+    color: var(--navy);
+    white-space: nowrap;
+  }
+  .overview-table td:first-child::before {
+    content: "";
+    display: inline-block;
+    width: 4px;
+    height: 14px;
+    background: var(--gold);
+    border-radius: 2px;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  /* ── background text ── */
+  .bg-text p {
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .bg-text p:last-child { margin-bottom: 0; }
+
+  /* ── before/after ── */
+  .ba-wrap {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 16px;
+    align-items: center;
+    margin-top: 4px;
+  }
+  .ba-box {
+    border-radius: 12px;
+    padding: 24px 20px;
+    text-align: center;
+  }
+  .ba-box.before {
+    background: #EEF2F7;
+    border: 1.5px solid #C7D4E2;
+  }
+  .ba-box.after {
+    background: #FFF8E8;
+    border: 1.5px solid var(--gold);
+  }
+  .ba-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    margin-bottom: 10px;
+  }
+  .before .ba-label { color: var(--muted); }
+  .after  .ba-label { color: var(--gold); }
+  .ba-box ul {
+    list-style: none;
+    text-align: left;
+    font-size: 14px;
+    line-height: 1.8;
+  }
+  .ba-box ul li::before {
+    margin-right: 6px;
+  }
+  .before ul li::before { content: "✗"; color: #9AA6B2; }
+  .after  ul li::before { content: "✓"; color: var(--gold); }
+  .ba-arrow {
+    font-size: 32px;
+    color: var(--gold);
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  /* ── program table ── */
+  .program-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14.5px;
+  }
+  .program-table thead tr {
+    background: var(--navy);
+    color: var(--white);
+  }
+  .program-table thead th {
+    padding: 10px 16px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: .05em;
+  }
+  .program-table thead th:first-child { border-radius: 10px 0 0 0; }
+  .program-table thead th:last-child  { border-radius: 0 10px 0 0; }
+  .program-table tbody tr:nth-child(odd) { background: #F7F4EE; }
+  .program-table tbody td {
+    padding: 12px 16px;
+    vertical-align: top;
+    border-bottom: 1px solid #EDE9E0;
+  }
+  .program-table tbody td:first-child {
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--navy);
+  }
+  .program-table tbody td:last-child {
+    white-space: nowrap;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .break-row td { color: var(--muted) !important; font-style: italic; }
+
+  /* ── checklist ── */
+  .checklist {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 15px;
+  }
+  .check-icon {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    background: var(--gold);
+    border-radius: 50%;
+    color: var(--white);
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+  }
+
+  /* ── notes ── */
+  .notes-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .notes-block h3 {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--gold);
+    display: inline-block;
+  }
+  .notes-block ul {
+    list-style: none;
+    font-size: 14px;
+    line-height: 1.9;
+    color: var(--muted);
+  }
+  .notes-block ul li::before {
+    content: "・";
+    color: var(--gold);
+  }
+
+  /* ── footer ── */
+  footer {
+    background: var(--navy);
+    color: rgba(255,255,255,.55);
+    text-align: center;
+    padding: 22px 16px;
+    font-size: 12.5px;
+    letter-spacing: .04em;
+  }
+  footer span { color: var(--gold); }
+
+  @media (max-width: 600px) {
+    .card { padding: 22px 18px; }
+    .ba-wrap { grid-template-columns: 1fr; }
+    .ba-arrow { transform: rotate(90deg); text-align: center; }
+    .notes-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="header-label">社内企画書 ／ INTERNAL USE</div>
+  <h1>週末ではじめる<br>「ベランダ家庭菜園」入門セミナー</h1>
+  <p class="catchcopy">土を知り、育てる喜びを。日曜の午後、ベランダから食卓へ。</p>
+</header>
+
+<main>
+
+  <!-- ① 開催概要 -->
+  <div class="card">
+    <div class="section-heading">
+      <div class="badge">1</div>
+      <h2>開催概要</h2>
+    </div>
+    <table class="overview-table">
+      <tbody>
+        <tr>
+          <td>開催日時</td>
+          <td>2026年7月5日（日）13:00〜15:30（受付開始 12:50）</td>
+        </tr>
+        <tr>
+          <td>開催形式</td>
+          <td>オンライン（Zoom ウェビナー）</td>
+        </tr>
+        <tr>
+          <td>定員</td>
+          <td>先着 30 名</td>
+        </tr>
+        <tr>
+          <td>参加費</td>
+          <td>一般：1,500円 ／ 会員：無料</td>
+        </tr>
+        <tr>
+          <td>対象</td>
+          <td>家庭菜園に興味があるが未経験の方・ベランダや窓辺のスペースがある方</td>
+        </tr>
+        <tr>
+          <td>申込締切</td>
+          <td>2026年6月28日（日）23:59 まで</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ② 背景・なぜ今やるのか -->
+  <div class="card">
+    <div class="section-heading">
+      <div class="badge">2</div>
+      <h2>背景・なぜ今やるのか</h2>
+    </div>
+    <div class="bg-text">
+      <p>
+        コロナ禍以降、在宅時間の増加にともない「自分で野菜を育てたい」というニーズが急増し、
+        家庭菜園関連の検索数は過去5年で約2.4倍に拡大しています（農林水産省統計・2025年度参照）。
+      </p>
+      <p>
+        一方で「何から始めればいいかわからない」「失敗が怖い」という初心者の声も多く、
+        実践的な入門コンテンツへの需要が高まっています。
+      </p>
+      <p>
+        本セミナーは、専門知識ゼロの方でも当日から実践できる内容に特化することで、
+        新規会員獲得と既存会員のエンゲージメント向上を同時に狙います。
+      </p>
+    </div>
+  </div>
+
+  <!-- ③ 受講後のゴール（BEFORE → AFTER） -->
+  <div class="card">
+    <div class="section-heading">
+      <div class="badge">3</div>
+      <h2>受講後のゴール</h2>
+    </div>
+    <div class="ba-wrap">
+      <div class="ba-box before">
+        <div class="ba-label">BEFORE</div>
+        <ul>
+          <li>何を植えたらいいか分からない</li>
+          <li>土や肥料の選び方が不安</li>
+          <li>水やりのタイミングが謎</li>
+          <li>ベランダに必要な道具が不明</li>
+        </ul>
+      </div>
+      <div class="ba-arrow">→</div>
+      <div class="ba-box after">
+        <div class="ba-label">AFTER</div>
+        <ul>
+          <li>初心者向け野菜5選を説明できる</li>
+          <li>培養土・肥料を自分で選べる</li>
+          <li>季節ごとの水やり管理ができる</li>
+          <li>最小限の道具セットを揃えられる</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ④ プログラム -->
+  <div class="card">
+    <div class="section-heading">
+      <div class="badge">4</div>
+      <h2>プログラム</h2>
+    </div>
+    <table class="program-table">
+      <thead>
+        <tr>
+          <th style="width:110px">時刻</th>
+          <th>内容</th>
+          <th style="width:80px">所要</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>12:50</td>
+          <td>受付開始・Zoom 入室</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>13:00</td>
+          <td>オープニング・本日の流れ説明</td>
+          <td>5 分</td>
+        </tr>
+        <tr>
+          <td>13:05</td>
+          <td>【第1部】ベランダ菜園の基本：スペース・日照・季節の考え方</td>
+          <td>25 分</td>
+        </tr>
+        <tr>
+          <td>13:30</td>
+          <td>【第2部】初心者向け野菜5選と種・苗の選び方</td>
+          <td>25 分</td>
+        </tr>
+        <tr class="break-row">
+          <td>13:55</td>
+          <td>休憩</td>
+          <td>10 分</td>
+        </tr>
+        <tr>
+          <td>14:05</td>
+          <td>【第3部】土・肥料・プランターの選び方 ＋ 実演デモ（画面共有）</td>
+          <td>30 分</td>
+        </tr>
+        <tr>
+          <td>14:35</td>
+          <td>【第4部】水やり・病害虫・収穫のポイント</td>
+          <td>20 分</td>
+        </tr>
+        <tr>
+          <td>14:55</td>
+          <td>Q&A セッション</td>
+          <td>25 分</td>
+        </tr>
+        <tr>
+          <td>15:20</td>
+          <td>クロージング・次回案内</td>
+          <td>10 分</td>
+        </tr>
+        <tr>
+          <td>15:30</td>
+          <td>閉会</td>
+          <td>—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ⑤ こんな方におすすめ -->
+  <div class="card">
+    <div class="section-heading">
+      <div class="badge">5</div>
+      <h2>こんな方におすすめ</h2>
+    </div>
+    <ul class="checklist">
+      <li>
+        <div class="check-icon">✓</div>
+        <span>「家庭菜園に挑戦したいけど何から始めればよいか分からない」という完全初心者の方</span>
+      </li>
+      <li>
+        <div class="check-icon">✓</div>
+        <span>一戸建てではなくマンション・アパート暮らしで、ベランダや窓辺の限られたスペースを活用したい方</span>
+      </li>
+      <li>
+        <div class="check-icon">✓</div>
+        <span>自分で育てた野菜を食卓に並べる体験をしてみたい、食育や健康・エコに関心がある方</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- ⑥ 持ち物・注意事項 -->
+  <div class="card">
+    <div class="section-heading">
+      <div class="badge">6</div>
+      <h2>持ち物・注意事項</h2>
+    </div>
+    <div class="notes-grid">
+      <div class="notes-block">
+        <h3>持ち物（任意）</h3>
+        <ul>
+          <li>メモ帳・筆記用具（または PC ・スマホでメモ）</li>
+          <li>現在所有のプランター・道具（あれば画面に映してご相談可）</li>
+          <li>育てたい野菜・ハーブのリスト</li>
+        </ul>
+      </div>
+      <div class="notes-block">
+        <h3>注意事項</h3>
+        <ul>
+          <li>Zoom の最新バージョンをご用意ください</li>
+          <li>録画・録音・スクリーンショットの無断転載は禁止です</li>
+          <li>通信費はご参加者のご負担となります</li>
+          <li>欠席の場合は前日までにご連絡ください</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑦ 備考 -->
+  <div class="card">
+    <div class="section-heading">
+      <div class="badge">7</div>
+      <h2>備考・今後の展開</h2>
+    </div>
+    <div class="bg-text">
+      <p>
+        本セミナーを起点に、秋冬編・上級編・リアル農園見学ツアーなど、
+        シリーズ展開を検討しています。
+      </p>
+      <p>
+        アンケート結果をもとに次回テーマを決定し、継続受講者向けの会員優待制度の導入も視野に入れます。
+      </p>
+    </div>
+  </div>
+
+</main>
+
+<!-- ── FOOTER ── -->
+<footer>
+  Produced with Claude Code ✦ 主催：<span>グリーンライフ研究会</span>
+</footer>
+
+</body>
+</html>

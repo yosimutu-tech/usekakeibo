@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>参加者案内 ｜ ベランダ家庭菜園入門セミナー</title>
+<style>
+  :root {
+    --navy:  #16365C;
+    --gold:  #F4A300;
+    --bg:    #FBF8F1;
+    --white: #FFFFFF;
+    --text:  #2D2D2D;
+    --muted: #5A6370;
+    --shadow: 0 4px 20px rgba(22,54,92,.10);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans JP",
+                 "Meiryo", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, var(--navy) 0%, #1E4A7A 50%, var(--gold) 100%);
+    padding: 80px 24px 72px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 70% 30%, rgba(244,163,0,.18) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    display: inline-block;
+    border: 1.5px solid rgba(244,163,0,.7);
+    color: var(--gold);
+    font-size: 12px;
+    letter-spacing: .18em;
+    padding: 4px 16px;
+    border-radius: 20px;
+    margin-bottom: 24px;
+  }
+  .hero h1 {
+    color: var(--white);
+    font-size: clamp(26px, 5vw, 46px);
+    font-weight: 800;
+    line-height: 1.25;
+    margin-bottom: 16px;
+  }
+  .hero h1 em {
+    font-style: normal;
+    color: var(--gold);
+  }
+  .hero-sub {
+    color: rgba(255,255,255,.80);
+    font-size: 17px;
+    margin-bottom: 32px;
+  }
+  .hero-meta {
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px 28px;
+    margin-bottom: 40px;
+  }
+  .hero-meta span {
+    color: var(--white);
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .hero-meta .dot {
+    width: 8px;
+    height: 8px;
+    background: var(--gold);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .btn {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--navy);
+    font-size: 17px;
+    font-weight: 700;
+    padding: 16px 48px;
+    border-radius: 50px;
+    text-decoration: none;
+    letter-spacing: .05em;
+    box-shadow: 0 6px 24px rgba(244,163,0,.45);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(244,163,0,.55);
+  }
+  .btn-note {
+    color: rgba(255,255,255,.65);
+    font-size: 12px;
+    margin-top: 12px;
+  }
+
+  /* ── SECTION WRAPPER ── */
+  .section {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 64px 20px;
+  }
+  .section-label {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .2em;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .section-title {
+    text-align: center;
+    font-size: clamp(20px, 3vw, 28px);
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 40px;
+  }
+
+  /* ── 3 POINTS ── */
+  .points-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .point-card {
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 32px 24px 28px;
+    text-align: center;
+    position: relative;
+    border-top: 4px solid var(--gold);
+  }
+  .point-emoji {
+    font-size: 40px;
+    line-height: 1;
+    margin-bottom: 14px;
+  }
+  .point-num {
+    position: absolute;
+    top: -1px;
+    left: 22px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    color: var(--gold);
+  }
+  .point-card h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 10px;
+    line-height: 1.4;
+  }
+  .point-card p {
+    font-size: 13.5px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, #D9D3C5, transparent);
+    margin: 0 auto;
+    max-width: 600px;
+  }
+
+  /* ── FAQ ── */
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .faq-item {
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .faq-q {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 22px 28px;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--navy);
+  }
+  .faq-badge {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    background: var(--gold);
+    border-radius: 50%;
+    color: var(--white);
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+  .faq-a {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 0 28px 22px 28px;
+    margin-left: 44px;
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.75;
+  }
+  .faq-a-label {
+    flex-shrink: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-top: 1px;
+  }
+  .faq-sep {
+    height: 1px;
+    background: #EDE9E0;
+    margin: 0 28px;
+  }
+
+  /* ── CTA ── */
+  .cta-section {
+    background: var(--navy);
+    padding: 72px 24px;
+    text-align: center;
+  }
+  .cta-section h2 {
+    color: var(--white);
+    font-size: clamp(20px, 3.5vw, 30px);
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 16px;
+  }
+  .cta-section h2 em {
+    font-style: normal;
+    color: var(--gold);
+  }
+  .cta-section p {
+    color: rgba(255,255,255,.70);
+    font-size: 15px;
+    max-width: 540px;
+    margin: 0 auto 36px;
+    line-height: 1.8;
+  }
+  .cta-detail {
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 24px;
+    margin-bottom: 36px;
+  }
+  .cta-detail span {
+    background: rgba(255,255,255,.10);
+    border: 1px solid rgba(255,255,255,.20);
+    color: var(--white);
+    border-radius: 6px;
+    padding: 5px 14px;
+    font-size: 13px;
+  }
+  .btn-large {
+    font-size: 19px;
+    padding: 20px 64px;
+  }
+  .cta-sub {
+    color: rgba(255,255,255,.50);
+    font-size: 12px;
+    margin-top: 16px;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: #0E243D;
+    color: rgba(255,255,255,.45);
+    text-align: center;
+    padding: 22px 16px;
+    font-size: 12.5px;
+    letter-spacing: .04em;
+  }
+  footer span { color: var(--gold); }
+
+  @media (max-width: 640px) {
+    .points-grid { grid-template-columns: 1fr; }
+    .hero { padding: 60px 20px 56px; }
+    .btn { padding: 14px 36px; font-size: 16px; }
+    .faq-a { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-eyebrow">ONLINE SEMINAR ／ 初心者大歓迎</div>
+  <h1>週末ではじめる<br><em>「ベランダ家庭菜園」</em><br>入門セミナー</h1>
+  <p class="hero-sub">道具の選び方から収穫まで、今日から実践できる2時間半</p>
+
+  <div class="hero-meta">
+    <span><span class="dot"></span>2026年7月5日（日）13:00〜15:30</span>
+    <span><span class="dot"></span>Zoom オンライン開催</span>
+    <span><span class="dot"></span>定員 30 名・先着順</span>
+    <span><span class="dot"></span>参加費 1,500 円</span>
+  </div>
+
+  <a href="#" class="btn">今すぐ申し込む</a>
+  <p class="btn-note">申込締切：2026年6月28日（日）23:59</p>
+</section>
+
+<!-- ── 3 POINTS ── -->
+<section class="section">
+  <p class="section-label">HIGHLIGHTS</p>
+  <h2 class="section-title">このセミナー、3つのポイント</h2>
+
+  <div class="points-grid">
+    <div class="point-card">
+      <div class="point-num">POINT 1</div>
+      <div class="point-emoji">🌱</div>
+      <h3>ゼロから分かる<br>基礎知識</h3>
+      <p>土・プランター・肥料の選び方を丁寧に解説。専門用語なしで、初めての方でも迷わず実践に進めます。</p>
+    </div>
+    <div class="point-card">
+      <div class="point-num">POINT 2</div>
+      <div class="point-emoji">🥬</div>
+      <h3>初心者向け<br>野菜5選を伝授</h3>
+      <p>失敗しにくく、収穫までの期間が短い野菜をピックアップ。種・苗の選び方から水やりのコツまで丸ごと学べます。</p>
+    </div>
+    <div class="point-card">
+      <div class="point-num">POINT 3</div>
+      <div class="point-emoji">💬</div>
+      <h3>25分 Q&A で<br>疑問を即解決</h3>
+      <p>講師への質問タイムをたっぷり確保。「うちのベランダでも育つ？」などの個別の悩みにも答えます。</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── FAQ ── -->
+<section class="section">
+  <p class="section-label">FAQ</p>
+  <h2 class="section-title">よくある質問</h2>
+
+  <div class="faq-list">
+
+    <div class="faq-item">
+      <div class="faq-q">
+        <div class="faq-badge">Q</div>
+        <span>ベランダが狭くてもプランター菜園はできますか？</span>
+      </div>
+      <div class="faq-sep"></div>
+      <div class="faq-a">
+        <span class="faq-a-label">A.</span>
+        <span>はい、大丈夫です！奥行き 60cm・幅 90cm 程度のスペースがあれば十分に楽しめます。セミナーでは、限られたスペースに合わせたプランター配置のコツや、縦型スタンドを使った空間活用術もご紹介します。</span>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">
+        <div class="faq-badge">Q</div>
+        <span>参加後に録画を見返すことはできますか？</span>
+      </div>
+      <div class="faq-sep"></div>
+      <div class="faq-a">
+        <span class="faq-a-label">A.</span>
+        <span>はい、お申し込みいただいた方には開催後 2 週間、アーカイブ動画を無料でご視聴いただけます。お申し込み完了メールに視聴リンクをお届けしますので、ご都合の合わない日時でもご安心ください。</span>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">
+        <div class="faq-badge">Q</div>
+        <span>参加費の支払い方法と領収書の発行は可能ですか？</span>
+      </div>
+      <div class="faq-sep"></div>
+      <div class="faq-a">
+        <span class="faq-a-label">A.</span>
+        <span>クレジットカード（Visa・Mastercard・JCB）および銀行振込にてお支払いいただけます。お申し込み完了後にマイページより領収書（PDF）をダウンロードできます。法人でのお申し込みの場合もご利用いただけます。</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── CTA ── -->
+<section class="cta-section">
+  <h2>今週末、最初の<em>一粒</em>を<br>一緒に植えましょう。</h2>
+  <p>
+    知識も道具も、今はゼロで大丈夫。<br>
+    2時間半で、ベランダを小さな農園に変えるノウハウを手に入れてください。
+  </p>
+
+  <div class="cta-detail">
+    <span>📅 2026年7月5日（日）13:00〜</span>
+    <span>💻 Zoom オンライン</span>
+    <span>👥 定員 30 名</span>
+    <span>💴 1,500 円</span>
+  </div>
+
+  <a href="#" class="btn btn-large">参加申し込みはこちら</a>
+  <p class="cta-sub">締切：2026年6月28日（日）23:59 ／ 先着順のためお早めにどうぞ</p>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  Produced with Claude Code ✦ 主催：<span>グリーンライフ研究会</span>
+</footer>
+
+</body>
+</html>
