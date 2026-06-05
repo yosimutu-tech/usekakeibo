@@ -99,8 +99,8 @@
     -webkit-tap-highlight-color: transparent;
   }
   .nav-tab.active { color: var(--navy); }
-  .nav-tab svg { width: 22px; height: 22px; }
-  .nav-tab span { font-size: 10px; font-weight: 600; }
+  .nav-tab svg { width: 20px; height: 20px; }
+  .nav-tab span { font-size: 9px; font-weight: 600; }
   .nav-badge {
     position: absolute;
     top: 8px;
@@ -528,10 +528,34 @@
   .mt-2 { margin-top: 8px; }
   .p-16 { padding: 16px; }
 
+  /* ─── Menu Item Card ─── */
+  .menu-item-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin: 0 16px 10px;
+    overflow: hidden;
+    display: flex;
+    align-items: stretch;
+  }
+  .menu-item-card.unavailable { opacity: 0.55; }
+  .menu-item-accent {
+    width: 5px;
+    flex-shrink: 0;
+  }
+  .menu-item-body { flex: 1; padding: 13px 14px; }
+  .menu-item-name { font-weight: 700; font-size: 16px; color: var(--navy); }
+  .menu-item-desc { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+  .menu-item-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+  .menu-item-price { font-size: 18px; font-weight: 800; color: var(--navy); }
+  .menu-item-actions { display: flex; gap: 6px; align-items: center; }
+
   /* ─── Responsive ─── */
   @media (min-width: 480px) {
     #app-header h1 { font-size: 20px; }
     .stats-grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
+    .nav-tab svg { width: 22px; height: 22px; }
+    .nav-tab span { font-size: 10px; }
   }
 </style>
 </head>
@@ -612,6 +636,22 @@
     <button class="fab" id="si-fab" onclick="App.openSalesFab()" title="追加">＋</button>
   </section>
 
+  <!-- ═══ MENU ═══ -->
+  <section id="sec-menu" class="section">
+    <div class="section-header">
+      <div class="section-title">メニュー管理</div>
+      <button class="btn btn-gold btn-sm" onclick="App.openMenuModal()">＋ 追加</button>
+    </div>
+    <div class="filter-tabs" id="menu-filter-tabs">
+      <div class="filter-tab active" data-filter="all" onclick="App.setMenuFilter('all',this)">すべて</div>
+      <div class="filter-tab" data-filter="フード" onclick="App.setMenuFilter('フード',this)">フード</div>
+      <div class="filter-tab" data-filter="ドリンク" onclick="App.setMenuFilter('ドリンク',this)">ドリンク</div>
+      <div class="filter-tab" data-filter="デザート" onclick="App.setMenuFilter('デザート',this)">デザート</div>
+      <div class="filter-tab" data-filter="アルコール" onclick="App.setMenuFilter('アルコール',this)">アルコール</div>
+    </div>
+    <div id="menu-list"></div>
+  </section>
+
   <!-- ═══ POINTS ═══ -->
   <section id="sec-points" class="section">
     <div class="section-header">
@@ -644,6 +684,10 @@
   <button class="nav-tab" data-tab="sales" onclick="App.switchTab('sales')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6"/></svg>
     <span>売上・在庫</span>
+  </button>
+  <button class="nav-tab" data-tab="menu" onclick="App.switchTab('menu')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h12"/><circle cx="19" cy="18" r="2"/></svg>
+    <span>メニュー</span>
   </button>
   <button class="nav-tab" data-tab="points" onclick="App.switchTab('points')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
@@ -857,6 +901,45 @@
   </div>
 </div>
 
+<!-- Menu Item Modal -->
+<div class="modal-overlay" id="modal-menu" onclick="App.closeModal('modal-menu')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modal-menu-title">メニューを追加</div>
+    <form id="menu-form" onsubmit="App.saveMenuItem(event)">
+      <div class="form-group">
+        <label class="form-label">品名</label>
+        <input type="text" class="form-control" id="menu-name" placeholder="ランチセットA" required>
+      </div>
+      <div class="input-row">
+        <div class="form-group">
+          <label class="form-label">カテゴリ</label>
+          <select class="form-control" id="menu-category">
+            <option>フード</option><option>ドリンク</option><option>デザート</option><option>アルコール</option><option>その他</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">価格 (円・税込)</label>
+          <input type="number" class="form-control" id="menu-price" placeholder="980" required min="0">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">説明・備考</label>
+        <textarea class="form-control" id="menu-desc" rows="2" placeholder="食材・アレルゲン・おすすめポイントなど"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">提供状態</label>
+        <select class="form-control" id="menu-available">
+          <option value="1">提供中</option>
+          <option value="0">品切れ・停止中</option>
+        </select>
+      </div>
+      <input type="hidden" id="menu-edit-id">
+      <button type="submit" class="btn btn-primary btn-block mt-2">保存する</button>
+    </form>
+  </div>
+</div>
+
 <!-- Toast -->
 <div id="toast"></div>
 
@@ -867,8 +950,9 @@ const App = {
   resTab: 'today',
   salesTab: 'sales',
   pointsTab: 'add',
+  menuFilter: 'all',
   nextId: 100,
-  data: { orders: [], reservations: [], sales: [], inventory: [], customers: [] },
+  data: { orders: [], reservations: [], sales: [], inventory: [], customers: [], menuItems: [] },
 
   // ─── Init ────────────────────────────────
   init() {
@@ -885,6 +969,7 @@ const App = {
       if (s) {
         this.data = JSON.parse(s);
         this.nextId = (this.data._nextId || 100);
+        if (!this.data.menuItems) this.data.menuItems = [];
       }
     } catch(e) {}
   },
@@ -959,6 +1044,24 @@ const App = {
       { id:32, name:'佐藤 次郎', phone:'070-1111-2222', points:100, stamps:10, visits:5, lastVisit:'2026-05-28' },
     ];
 
+    this.data.menuItems = [
+      { id:60, name:'ランチセットA', category:'フード', price:1200, desc:'日替わりメイン＋サラダ＋ライス＋スープ', available:true },
+      { id:61, name:'ランチセットB', category:'フード', price:980, desc:'パスタ＋サラダ＋ドリンク', available:true },
+      { id:62, name:'和定食', category:'フード', price:1500, desc:'焼き魚・煮物・味噌汁・ご飯・小鉢2品', available:true },
+      { id:63, name:'ハンバーグプレート', category:'フード', price:1380, desc:'国産牛100%・デミグラスソース', available:true },
+      { id:64, name:'シーザーサラダ', category:'フード', price:580, desc:'自家製ドレッシング', available:true },
+      { id:65, name:'コーヒー', category:'ドリンク', price:380, desc:'ブレンド / アイス選択可', available:true },
+      { id:66, name:'オレンジジュース', category:'ドリンク', price:350, desc:'生搾り', available:true },
+      { id:67, name:'緑茶', category:'ドリンク', price:280, desc:'ホット / アイス', available:true },
+      { id:68, name:'ソフトドリンク各種', category:'ドリンク', price:300, desc:'コーラ・ジンジャーエール・ウーロン茶', available:true },
+      { id:69, name:'生ビール', category:'アルコール', price:580, desc:'中ジョッキ', available:true },
+      { id:70, name:'ハイボール', category:'アルコール', price:480, desc:'', available:true },
+      { id:71, name:'赤ワイン（グラス）', category:'アルコール', price:680, desc:'フランス産', available:true },
+      { id:72, name:'日本酒（1合）', category:'アルコール', price:550, desc:'本日の銘柄はお問い合わせください', available:true },
+      { id:73, name:'チーズケーキ', category:'デザート', price:480, desc:'自家製・バニラアイス添え', available:true },
+      { id:74, name:'季節のシャーベット', category:'デザート', price:420, desc:'本日の味はお問い合わせください', available:false },
+    ];
+
     this.nextId = 200;
     this.saveData();
   },
@@ -973,7 +1076,8 @@ const App = {
     this.renderSection(tab);
 
     const fab = document.getElementById('si-fab');
-    if (fab) fab.style.display = tab==='sales' ? 'flex' : 'none';
+    if (fab) fab.style.display = (tab==='sales' || tab==='menu') ? 'flex' : 'none';
+    if (fab) fab.onclick = tab==='menu' ? ()=>this.openMenuModal() : ()=>this.openSalesFab();
   },
 
   renderSection(tab) {
@@ -981,6 +1085,7 @@ const App = {
     else if (tab==='orders') this.renderOrders();
     else if (tab==='reservations') this.renderReservations();
     else if (tab==='sales') this.renderSalesContent();
+    else if (tab==='menu') this.renderMenu();
     else if (tab==='points') this.renderCustomers();
   },
 
@@ -989,6 +1094,7 @@ const App = {
     this.renderOrders();
     this.renderReservations();
     this.renderSalesContent();
+    this.renderMenu();
     this.renderCustomers();
     const fab = document.getElementById('si-fab');
     if (fab) fab.style.display = 'none';
@@ -1648,6 +1754,112 @@ const App = {
     this.renderStampCard(c);
     this.saveData();
     this.renderCustomers();
+  },
+
+  // ─── Menu Management ─────────────────────
+  categoryColor(cat) {
+    return { 'フード':'#16365C', 'ドリンク':'#1565C0', 'デザート':'#C62828', 'アルコール':'#2E7D32', 'その他':'#F57C00' }[cat] || '#888';
+  },
+
+  renderMenu() {
+    if (!this.data.menuItems) this.data.menuItems = [];
+    const list = this.data.menuItems.filter(m=>
+      this.menuFilter==='all' || m.category===this.menuFilter
+    ).sort((a,b)=>a.category.localeCompare(b.category)||a.name.localeCompare(b.name));
+
+    const el = document.getElementById('menu-list');
+    if (!el) return;
+    if (list.length===0) {
+      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🍽️</div><div class="empty-state-text">メニューがありません</div></div>';
+      return;
+    }
+    el.innerHTML = list.map(m=>`
+      <div class="menu-item-card${m.available?'':' unavailable'}">
+        <div class="menu-item-accent" style="background:${this.categoryColor(m.category)}"></div>
+        <div class="menu-item-body">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
+            <div class="menu-item-name">${m.name}</div>
+            ${m.available ? '' : '<span class="badge badge-low" style="font-size:10px">品切れ</span>'}
+          </div>
+          ${m.desc ? `<div class="menu-item-desc">${m.desc}</div>` : ''}
+          <div class="menu-item-footer">
+            <div class="menu-item-price">${this.formatMoney(m.price)}<span style="font-size:12px;font-weight:400;color:var(--text-muted)">（税込）</span></div>
+            <div class="menu-item-actions">
+              <button class="btn btn-sm" style="background:${m.available?'#ffebee':'#E8F5E9'};color:${m.available?'var(--danger)':'var(--success)'};font-size:12px;padding:4px 10px" onclick="App.toggleMenuAvailability(${m.id})">${m.available?'品切れ':'再開'}</button>
+              <button class="btn btn-sm" style="background:#f5f5f5;color:#666;padding:4px 8px" onclick="App.openMenuModal(${m.id})">編集</button>
+              <button class="btn btn-sm" style="background:#ffebee;color:var(--danger);padding:4px 8px" onclick="App.deleteMenuItem(${m.id})">✕</button>
+            </div>
+          </div>
+        </div>
+      </div>`).join('');
+  },
+
+  setMenuFilter(f, el) {
+    this.menuFilter = f;
+    document.querySelectorAll('#menu-filter-tabs .filter-tab').forEach(t=>t.classList.remove('active'));
+    el.classList.add('active');
+    this.renderMenu();
+  },
+
+  toggleMenuAvailability(id) {
+    const m = this.data.menuItems.find(x=>x.id===id);
+    if (!m) return;
+    m.available = !m.available;
+    this.saveData();
+    this.renderMenu();
+    this.toast(m.available ? '提供を再開しました' : '品切れにしました');
+  },
+
+  openMenuModal(id) {
+    document.getElementById('menu-form').reset();
+    document.getElementById('menu-edit-id').value = '';
+    document.getElementById('menu-available').value = '1';
+    document.getElementById('modal-menu-title').textContent = 'メニューを追加';
+    if (id) {
+      const m = (this.data.menuItems||[]).find(x=>x.id===id);
+      if (m) {
+        document.getElementById('menu-edit-id').value = id;
+        document.getElementById('menu-name').value = m.name;
+        document.getElementById('menu-category').value = m.category;
+        document.getElementById('menu-price').value = m.price;
+        document.getElementById('menu-desc').value = m.desc||'';
+        document.getElementById('menu-available').value = m.available ? '1' : '0';
+        document.getElementById('modal-menu-title').textContent = 'メニューを編集';
+      }
+    }
+    document.getElementById('modal-menu').classList.add('open');
+  },
+
+  saveMenuItem(e) {
+    e.preventDefault();
+    if (!this.data.menuItems) this.data.menuItems = [];
+    const id = document.getElementById('menu-edit-id').value;
+    const item = {
+      id: id ? Number(id) : this.genId(),
+      name: document.getElementById('menu-name').value,
+      category: document.getElementById('menu-category').value,
+      price: Number(document.getElementById('menu-price').value),
+      desc: document.getElementById('menu-desc').value,
+      available: document.getElementById('menu-available').value === '1',
+    };
+    if (id) {
+      const idx = this.data.menuItems.findIndex(x=>x.id===Number(id));
+      if (idx>=0) this.data.menuItems[idx]=item;
+    } else {
+      this.data.menuItems.push(item);
+    }
+    this.saveData();
+    this.closeModal('modal-menu');
+    this.renderMenu();
+    this.toast(id ? 'メニューを更新しました' : 'メニューを追加しました');
+  },
+
+  deleteMenuItem(id) {
+    if (!confirm('このメニューを削除しますか？')) return;
+    this.data.menuItems = (this.data.menuItems||[]).filter(x=>x.id!==id);
+    this.saveData();
+    this.renderMenu();
+    this.toast('削除しました');
   },
 
   // ─── Modal helpers ───────────────────────
