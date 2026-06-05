@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>♿ こうべ車椅子トイレマップ</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue:    #1a6fc4;
+      --blue-dk: #0e4d8f;
+      --teal:    #0097a7;
+      --red:     #e53935;
+      --green:   #2e7d32;
+      --amber:   #f57f17;
+      --bg:      #f0f4f8;
+      --white:   #ffffff;
+      --text:    #1a1a2e;
+      --muted:   #607080;
+      --border:  #d0dce8;
+      --shadow:  0 4px 20px rgba(0,0,0,0.12);
+      --radius:  14px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ===== HEADER ===== */
+    #header {
+      background: linear-gradient(135deg, var(--blue-dk), var(--blue));
+      color: white;
+      padding: 10px 14px 8px;
+      flex-shrink: 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+      z-index: 100;
+    }
+    #header h1 {
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+    }
+    #header p {
+      font-size: 11px;
+      opacity: 0.8;
+      margin-top: 2px;
+    }
+    #filters {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      scrollbar-width: none;
+    }
+    #filters::-webkit-scrollbar { display: none; }
+    .filter-btn {
+      flex-shrink: 0;
+      background: rgba(255,255,255,0.18);
+      border: 1.5px solid rgba(255,255,255,0.4);
+      color: white;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-family: inherit;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .filter-btn.active {
+      background: white;
+      color: var(--blue-dk);
+      border-color: white;
+      font-weight: 700;
+    }
+
+    /* ===== AREA SELECTOR ===== */
+    #area-bar {
+      background: var(--blue-dk);
+      padding: 6px 14px;
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex-shrink: 0;
+    }
+    #area-bar::-webkit-scrollbar { display: none; }
+    .area-btn {
+      flex-shrink: 0;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: rgba(255,255,255,0.85);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .area-btn.active {
+      background: var(--teal);
+      border-color: var(--teal);
+      color: white;
+      font-weight: 700;
+    }
+    .area-btn.coming-soon {
+      opacity: 0.45;
+      cursor: default;
+    }
+
+    /* ===== MAP ===== */
+    #map {
+      flex: 1;
+      min-height: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ===== FLOATING BUTTONS ===== */
+    #fab-group {
+      position: absolute;
+      bottom: 20px;
+      right: 14px;
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .fab {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .fab:active { transform: scale(0.93); }
+    #btn-locate {
+      background: var(--blue);
+      color: white;
+    }
+    #btn-list {
+      background: white;
+      color: var(--blue);
+      font-size: 20px;
+    }
+
+    /* ===== BOTTOM PANEL (list) ===== */
+    #bottom-panel {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      border-radius: 20px 20px 0 0;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+      z-index: 400;
+      transform: translateY(calc(100% - 56px));
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      max-height: 75vh;
+      display: flex;
+      flex-direction: column;
+    }
+    #bottom-panel.open {
+      transform: translateY(0);
+    }
+    #panel-handle {
+      text-align: center;
+      padding: 10px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    #panel-handle span {
+      display: inline-block;
+      width: 40px;
+      height: 4px;
+      background: #ccc;
+      border-radius: 2px;
+    }
+    #panel-title {
+      padding: 0 16px 8px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    #toilet-list {
+      overflow-y: auto;
+      flex: 1;
+      padding: 0 12px 80px;
+    }
+    .toilet-card {
+      background: var(--bg);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      transition: all 0.2s;
+    }
+    .toilet-card:hover, .toilet-card.selected {
+      border-color: var(--blue);
+      background: #e8f0fb;
+    }
+    .toilet-card .card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .toilet-icon {
+      font-size: 24px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .card-info { flex: 1; min-width: 0; }
+    .card-name {
+      font-size: 15px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card-access {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .card-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 7px;
+    }
+    .badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 8px;
+    }
+    .badge-blue  { background: #dbeafe; color: #1e40af; }
+    .badge-green { background: #dcfce7; color: #166534; }
+    .badge-amber { background: #fef3c7; color: #92400e; }
+    .badge-red   { background: #fee2e2; color: #991b1b; }
+    .badge-teal  { background: #ccfbf1; color: #0f766e; }
+
+    /* ===== DETAIL PANEL ===== */
+    #detail-panel {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      border-radius: 20px 20px 0 0;
+      box-shadow: 0 -4px 24px rgba(0,0,0,0.18);
+      z-index: 600;
+      transform: translateY(100%);
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+    }
+    #detail-panel.open {
+      transform: translateY(0);
+    }
+    #detail-handle {
+      text-align: center;
+      padding: 10px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    #detail-handle span {
+      display: inline-block;
+      width: 40px;
+      height: 4px;
+      background: #ccc;
+      border-radius: 2px;
+    }
+    #detail-content {
+      overflow-y: auto;
+      flex: 1;
+      padding: 0 16px 30px;
+    }
+    #detail-name {
+      font-size: 20px;
+      font-weight: 900;
+      line-height: 1.3;
+      margin-bottom: 4px;
+    }
+    #detail-category {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .detail-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .detail-row:last-of-type { border-bottom: none; }
+    .detail-icon { font-size: 16px; flex-shrink: 0; width: 22px; text-align: center; margin-top: 1px; }
+    .detail-label { font-weight: 600; color: var(--muted); min-width: 72px; flex-shrink: 0; }
+    .detail-val { color: var(--text); flex: 1; }
+    #detail-features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 10px 0;
+    }
+    #detail-features .badge { font-size: 12px; padding: 4px 10px; }
+    #detail-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+      padding-bottom: 6px;
+    }
+    .action-btn {
+      flex: 1;
+      padding: 14px;
+      border-radius: var(--radius);
+      border: none;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .action-btn:active { transform: scale(0.97); }
+    #btn-route {
+      background: var(--red);
+      color: white;
+    }
+    #btn-close-detail {
+      background: var(--bg);
+      color: var(--muted);
+    }
+
+    /* ===== OVERLAY (map dimmer) ===== */
+    #overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.3);
+      z-index: 350;
+    }
+    #overlay.visible { display: block; }
+
+    /* ===== TOAST ===== */
+    #toast {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-80px);
+      background: #1a1a2e;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 24px;
+      font-size: 13px;
+      font-weight: 500;
+      z-index: 999;
+      transition: transform 0.3s;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ===== LEAFLET OVERRIDES ===== */
+    .leaflet-control-zoom { border: none !important; }
+    .leaflet-control-zoom a {
+      width: 36px !important;
+      height: 36px !important;
+      line-height: 36px !important;
+      font-size: 18px !important;
+      border-radius: 8px !important;
+      margin-bottom: 4px !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+    }
+    .toilet-marker-icon {
+      background: var(--blue);
+      border: 3px solid white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+      font-size: 16px;
+      color: white;
+      transition: transform 0.15s;
+    }
+    .toilet-marker-icon.h24 { background: var(--teal); }
+    .toilet-marker-icon.selected-marker {
+      background: var(--red);
+      transform: scale(1.25);
+      z-index: 1000 !important;
+    }
+    .user-marker {
+      width: 18px; height: 18px;
+      background: #2979ff;
+      border: 3px solid white;
+      border-radius: 50%;
+      box-shadow: 0 0 0 5px rgba(41,121,255,0.25);
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="header">
+  <h1>♿ こうべ車椅子トイレマップ</h1>
+  <p>神戸市の車椅子対応トイレを現在地からナビゲート</p>
+  <div id="filters">
+    <button class="filter-btn active" data-filter="all">すべて</button>
+    <button class="filter-btn" data-filter="h24">24時間</button>
+    <button class="filter-btn" data-filter="ostomy">オストメイト</button>
+    <button class="filter-btn" data-filter="bed">介助ベッド</button>
+    <button class="filter-btn" data-filter="washlet">ウォシュレット</button>
+  </div>
+</div>
+
+<!-- AREA SELECTOR -->
+<div id="area-bar">
+  <button class="area-btn active" data-area="sannomiya">🏙 三宮</button>
+  <button class="area-btn active" data-area="motomachi">🏘 元町</button>
+  <button class="area-btn active" data-area="kitano">⛪ 北野</button>
+  <button class="area-btn active" data-area="kobe-sta">🚉 神戸駅</button>
+  <button class="area-btn active" data-area="port">🚢 ポートアイランド</button>
+  <button class="area-btn active" data-area="higashinada">🍶 東灘区</button>
+  <button class="area-btn active" data-area="nada">🦁 灘区</button>
+  <button class="area-btn active" data-area="hyogo">⚓ 兵庫区</button>
+  <button class="area-btn active" data-area="nagata">🔥 長田区</button>
+  <button class="area-btn active" data-area="suma">🏖 須磨区</button>
+  <button class="area-btn active" data-area="tarumi">🌊 垂水区</button>
+  <button class="area-btn active" data-area="kita">🏔 北区</button>
+  <button class="area-btn active" data-area="nishi">🌾 西区</button>
+</div>
+
+<!-- MAP -->
+<div id="map">
+  <div id="overlay"></div>
+
+  <!-- FABs -->
+  <div id="fab-group">
+    <button class="fab" id="btn-locate" title="現在地を表示">📍</button>
+    <button class="fab" id="btn-list"   title="リスト表示">≡</button>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast"></div>
+
+  <!-- BOTTOM PANEL: list -->
+  <div id="bottom-panel">
+    <div id="panel-handle"><span></span></div>
+    <div id="panel-title">近くのトイレ一覧</div>
+    <div id="toilet-list"></div>
+  </div>
+
+  <!-- DETAIL PANEL -->
+  <div id="detail-panel">
+    <div id="detail-handle"><span></span></div>
+    <div id="detail-content">
+      <div id="detail-name"></div>
+      <div id="detail-category"></div>
+      <div id="detail-rows"></div>
+      <div id="detail-features"></div>
+      <div id="detail-actions">
+        <button class="action-btn" id="btn-route">🔴 ここへのルートを表示</button>
+        <button class="action-btn" id="btn-close-detail">✕ 閉じる</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
+<script>
+const AREAS = {
+  sannomiya:   "三宮エリア",
+  motomachi:   "元町エリア",
+  kitano:      "北野エリア",
+  "kobe-sta":  "神戸駅周辺",
+  port:        "ポートアイランド",
+  higashinada: "東灘区",
+  nada:        "灘区",
+  hyogo:       "兵庫区",
+  nagata:      "長田区",
+  suma:        "須磨区",
+  tarumi:      "垂水区",
+  kita:        "北区",
+  nishi:       "西区"
+};
+
+const TOILETS = [
+  // ===== 三宮エリア =====
+  { id:1, area:"sannomiya", name:"JR三ノ宮駅", lat:34.6939, lng:135.1956, category:"駅", time:"始発〜終電", h24:false, features:["車椅子対応","オストメイト","ウォシュレット"], address:"神戸市中央区布引町4-1-1", access:"JR三ノ宮駅構内", notes:"改札内外両方にあります" },
+  { id:2, area:"sannomiya", name:"阪神 神戸三宮駅", lat:34.6958, lng:135.1952, category:"駅", time:"始発〜終電", h24:false, features:["車椅子対応","多目的トイレ"], address:"神戸市中央区雲井通7-1-1", access:"阪神三宮駅構内", notes:"複数箇所に設置" },
+  { id:3, area:"sannomiya", name:"阪急 神戸三宮駅", lat:34.6952, lng:135.1931, category:"駅", time:"始発〜終電", h24:false, features:["車椅子対応","多目的トイレ"], address:"神戸市中央区加納町1-2-1", access:"阪急三宮駅構内 東改札付近", notes:"" },
+  { id:4, area:"sannomiya", name:"三宮バスターミナル", lat:34.6966, lng:135.1953, category:"公共", time:"終日", h24:true, features:["車椅子対応","オストメイト"], address:"神戸市中央区雲井通7-1", access:"JR三ノ宮駅北側すぐ", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:5, area:"sannomiya", name:"さんちか（地下街）", lat:34.6929, lng:135.1940, category:"商業施設", time:"10:00〜21:00", h24:false, features:["車椅子対応","オストメイト","ウォシュレット"], address:"神戸市中央区三宮町1-10-1", access:"三宮駅地下直結", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:6, area:"sannomiya", name:"さんプラザ", lat:34.6936, lng:135.1936, category:"商業施設", time:"10:00〜20:00", h24:false, features:["車椅子対応","オストメイト","ウォシュレット"], address:"神戸市中央区三宮町1-8-1", access:"三宮駅徒歩2分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:7, area:"sannomiya", name:"ミント神戸", lat:34.6961, lng:135.1964, category:"商業施設", time:"11:00〜20:00", h24:false, features:["車椅子対応","オストメイト","ウォシュレット","介助ベッド"], address:"神戸市中央区雲井通7-1-1", access:"JR三ノ宮駅東改札徒歩1分", notes:"各フロアに設置、きれいで使いやすい" },
+  { id:8, area:"sannomiya", name:"そごう神戸店", lat:34.6933, lng:135.1916, category:"商業施設", time:"10:00〜20:00", h24:false, features:["車椅子対応","オストメイト","多目的トイレ"], address:"神戸市中央区小野柄通8-1-8", access:"JR三ノ宮駅西口徒歩3分", notes:"各フロアに多目的トイレあり" },
+  { id:9, area:"sannomiya", name:"神戸マルイ", lat:34.6929, lng:135.1938, category:"商業施設", time:"11:00〜20:00", h24:false, features:["車椅子対応","多目的トイレ"], address:"神戸市中央区三宮町1-7-2", access:"JR三ノ宮駅西口徒歩3分", notes:"" },
+  { id:10, area:"sannomiya", name:"神戸市役所（1号館）", lat:34.6904, lng:135.1962, category:"公共施設", time:"8:45〜17:30（平日）", h24:false, features:["車椅子対応","オストメイト","介助ベッド"], address:"神戸市中央区加納町6-5-1", access:"JR三ノ宮駅徒歩10分", notes:"1階に設置。土日祝は利用制限あり" },
+  { id:11, area:"sannomiya", name:"三宮センター街", lat:34.6924, lng:135.1946, category:"公共", time:"24時間", h24:true, features:["車椅子対応"], address:"神戸市中央区三宮町1丁目", access:"JR三ノ宮駅徒歩2分", notes:"商店街内の公衆トイレ" },
+  { id:12, area:"sannomiya", name:"東遊園地", lat:34.6911, lng:135.1970, category:"公共", time:"24時間", h24:true, features:["車椅子対応","多目的トイレ"], address:"神戸市中央区加納町6", access:"JR三ノ宮駅徒歩8分", notes:"公園内、夜間照明あり" },
+  { id:13, area:"sannomiya", name:"神戸市立こうべ市民福祉交流センター", lat:34.6953, lng:135.1888, category:"公共施設", time:"9:00〜21:00", h24:false, features:["車椅子対応","オストメイト"], address:"神戸市中央区磯上通3-1-32", access:"三宮駅徒歩5分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:14, area:"sannomiya", name:"神戸サンボーホール", lat:34.6886, lng:135.1988, category:"公共施設", time:"9:00〜22:00", h24:false, features:["車椅子対応","オストメイト"], address:"神戸市中央区浜辺通5-1-32", access:"三宮駅徒歩12分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:15, area:"sannomiya", name:"神戸市立三宮駐車場", lat:34.6905, lng:135.1950, category:"公共", time:"7:00〜23:00", h24:false, features:["車椅子対応","オストメイト","ウォシュレット"], address:"神戸市中央区加納町6", access:"市役所隣", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+
+  // ===== 元町エリア =====
+  { id:20, area:"motomachi", name:"大丸神戸店", lat:34.6907, lng:135.1870, category:"商業施設", time:"10:00〜20:00", h24:false, features:["車椅子対応","オストメイト","ウォシュレット","介助ベッド"], address:"神戸市中央区明石町40", access:"元町駅すぐ", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:21, area:"motomachi", name:"神戸フコク生命海岸通ビル", lat:34.6880, lng:135.1875, category:"ビル", time:"9:00〜18:00（平日）", h24:false, features:["車椅子対応","オストメイト"], address:"神戸市中央区海岸通1-2-31", access:"元町駅徒歩5分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:22, area:"motomachi", name:"中突堤中央ターミナル（かもめりあ）", lat:34.6862, lng:135.1860, category:"公共施設", time:"9:00〜17:00", h24:false, features:["車椅子対応","多目的トイレ"], address:"神戸市中央区波止場町5", access:"元町駅徒歩15分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:23, area:"motomachi", name:"神戸市立花隈駐車場", lat:34.6896, lng:135.1833, category:"公共", time:"8:00〜22:00", h24:false, features:["車椅子対応","オストメイト","ウォシュレット"], address:"神戸市中央区花隈町1", access:"花隈駅すぐ", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:24, area:"motomachi", name:"JR元町駅", lat:34.6910, lng:135.1852, category:"駅", time:"始発〜終電", h24:false, features:["車椅子対応","多目的トイレ"], address:"神戸市中央区元町1-1-3", access:"JR元町駅構内", notes:"改札内外に設置" },
+  { id:25, area:"motomachi", name:"元町商店街（西口）公衆トイレ", lat:34.6898, lng:135.1820, category:"公共", time:"9:00〜21:00", h24:false, features:["車椅子対応","多目的トイレ"], address:"神戸市中央区元町通5丁目", access:"阪神元町駅徒歩3分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:26, area:"motomachi", name:"神戸市立博物館", lat:34.6888, lng:135.1889, category:"公共施設", time:"9:30〜17:30（月曜休）", h24:false, features:["車椅子対応","オストメイト","多目的トイレ"], address:"神戸市中央区京町24", access:"元町駅徒歩5分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+
+  // ===== 北野エリア =====
+  { id:30, area:"kitano", name:"北野トイレプラザ（北野観光案内所）", lat:34.7003, lng:135.1914, category:"公共", time:"9:00〜18:00", h24:false, features:["車椅子対応","多目的トイレ"], address:"神戸市中央区北野町3-10-20", access:"北野異人館エリア内", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:31, area:"kitano", name:"海外移住と文化の交流センター", lat:34.7010, lng:135.1882, category:"公共施設", time:"9:30〜17:00", h24:false, features:["車椅子対応"], address:"神戸市中央区山本通3-19-8", access:"三宮駅徒歩15分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:32, area:"kitano", name:"北野工房のまち", lat:34.7012, lng:135.1920, category:"観光施設", time:"10:00〜18:00", h24:false, features:["車椅子対応","多目的トイレ"], address:"神戸市中央区北野町3-11-24", access:"三宮駅から徒歩15分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:33, area:"kitano", name:"トアロード公衆トイレ", lat:34.6985, lng:135.1895, category:"公共", time:"24時間", h24:true, features:["車椅子対応"], address:"神戸市中央区中山手通3丁目", access:"三宮駅徒歩10分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:34, area:"kitano", name:"神戸文学館", lat:34.7022, lng:135.1893, category:"公共施設", time:"10:00〜17:00（月曜休）", h24:false, features:["車椅子対応","多目的トイレ"], address:"神戸市中央区山本通2-3-1", access:"三宮駅徒歩15分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+
+  // ===== 神戸駅周辺 =====
+  { id:40, area:"kobe-sta", name:"デュオこうべ 浜の手（地下街）", lat:34.6784, lng:135.1810, category:"商業施設", time:"10:00〜21:00", h24:false, features:["車椅子対応","オストメイト","ウォシュレット"], address:"神戸市中央区東川崎町1-2-3", access:"神戸駅地下直結", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:41, area:"kobe-sta", name:"umie サウスモール", lat:34.6760, lng:135.1842, category:"商業施設", time:"10:00〜20:00", h24:false, features:["車椅子対応","オストメイト","ウォシュレット","介助ベッド"], address:"神戸市中央区東川崎町1-7-2", access:"神戸駅徒歩5分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:42, area:"kobe-sta", name:"umie ノースモール", lat:34.6766, lng:135.1832, category:"商業施設", time:"10:00〜20:00", h24:false, features:["車椅子対応","オストメイト","ウォシュレット","介助ベッド"], address:"神戸市中央区東川崎町1-7-5", access:"神戸駅徒歩5分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:46, area:"kobe-sta", name:"神戸アンパンマンこどもミュージアム&モール", lat:34.6768, lng:135.1838, category:"観光施設", time:"10:00〜18:00", h24:false, features:["車椅子対応","オストメイト","ウォシュレット","介助ベッド"], address:"神戸市中央区東川崎町1-6-2", access:"神戸駅徒歩5分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:47, area:"kobe-sta", name:"ハーバーランド地下広場公衆トイレ", lat:34.6756, lng:135.1815, category:"公共", time:"6:00〜24:00", h24:false, features:["車椅子対応","オストメイト"], address:"神戸市中央区東川崎町1丁目", access:"神戸駅徒歩5分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+
+  // ===== ポートアイランド =====
+  { id:43, area:"port", name:"神戸市立医療センター中央市民病院", lat:34.6742, lng:135.2025, category:"医療施設", time:"24時間（外来は平日8:30〜）", h24:true, features:["車椅子対応","オストメイト","介助ベッド"], address:"神戸市中央区港島南町2-1-1", access:"医療センター駅すぐ", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:44, area:"port", name:"神戸ポートピアホテル", lat:34.6778, lng:135.2057, category:"ホテル", time:"24時間", h24:true, features:["車椅子対応","オストメイト","ウォシュレット","介助ベッド"], address:"神戸市中央区港島中町6-10-1", access:"市民広場駅すぐ", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:45, area:"port", name:"神戸どうぶつ王国", lat:34.6690, lng:135.2078, category:"観光施設", time:"9:00〜17:00", h24:false, features:["車椅子対応","オストメイト"], address:"神戸市中央区港島南町7-1-9", access:"神戸空港駅徒歩5分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:48, area:"port", name:"神戸国際展示場", lat:34.6798, lng:135.2068, category:"公共施設", time:"イベント開催時", h24:false, features:["車椅子対応","オストメイト","ウォシュレット","介助ベッド"], address:"神戸市中央区港島中町6-11-1", access:"市民広場駅徒歩3分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:49, area:"port", name:"神戸市看護大学", lat:34.6720, lng:135.2095, category:"公共施設", time:"平日8:00〜17:00", h24:false, features:["車椅子対応","多目的トイレ"], address:"神戸市中央区港島中町4-7-2", access:"医療センター駅徒歩8分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+
+  // ===== 東灘区 =====
+  { id:50, area:"higashinada", name:"東灘区役所", lat:34.7228, lng:135.2490, category:"公共施設", time:"8:45〜17:30（平日）", h24:false, features:["車椅子対応","オストメイト","介助ベッド"], address:"神戸市東灘区住吉東町5-2-1", access:"住吉駅徒歩5分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:51, area:"higashinada", name:"東灘図書館", lat:34.7218, lng:135.2488, category:"公共施設", time:"9:30〜19:00（平日）、〜17:00（土日祝）", h24:false, features:["車椅子対応"], address:"神戸市東灘区住吉東町2-3-40", access:"住吉駅徒歩3分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:52, area:"higashinada", name:"コープ甲南", lat:34.7208, lng:135.2615, category:"商業施設", time:"9:00〜21:00", h24:false, features:["車椅子対応","オストメイト","ウォシュレット","介助ベッド"], address:"神戸市東灘区甲南町3-1-18", access:"甲南山手駅徒歩3分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:53, area:"higashinada", name:"神戸ファッションマート", lat:34.6958, lng:135.2690, category:"商業施設", time:"10:00〜20:00", h24:false, features:["車椅子対応","オストメイト"], address:"神戸市東灘区向洋町中6-9", access:"魚崎駅徒歩10分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:54, area:"higashinada", name:"御影公会堂", lat:34.7155, lng:135.2388, category:"公共施設", time:"9:00〜21:00", h24:false, features:["車椅子対応","多目的トイレ"], address:"神戸市東灘区御影石町4-4-1", access:"御影駅徒歩5分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:55, area:"higashinada", name:"御影クラッセ", lat:34.7150, lng:135.2396, category:"商業施設", time:"10:00〜20:00", h24:false, features:["車椅子対応","オストメイト","ウォシュレット","介助ベッド"], address:"神戸市東灘区御影中町3-2-1", access:"御影駅すぐ", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+
+  // ===== 灘区 =====
+  { id:60, area:"nada", name:"灘区役所", lat:34.7178, lng:135.2142, category:"公共施設", time:"8:45〜17:30（平日）", h24:false, features:["車椅子対応","オストメイト","介助ベッド"], address:"神戸市灘区桜口町4-2-1", access:"六甲道駅徒歩5分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:61, area:"nada", name:"王子スタジアム", lat:34.7085, lng:135.2000, category:"スポーツ施設", time:"試合・イベント開催時", h24:false, features:["車椅子対応","オストメイト"], address:"神戸市灘区王子町2-1", access:"王子公園駅徒歩5分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:62, area:"nada", name:"王子動物園", lat:34.7087, lng:135.2009, category:"観光施設", time:"9:00〜17:00（火曜休）", h24:false, features:["車椅子対応","オストメイト","ウォシュレット","介助ベッド"], address:"神戸市灘区王子町3-1", access:"王子公園駅徒歩3分", notes:"園内複数箇所に設置" },
+  { id:63, area:"nada", name:"JR六甲道駅", lat:34.7183, lng:135.2147, category:"駅", time:"始発〜終電", h24:false, features:["車椅子対応","オストメイト","多目的トイレ"], address:"神戸市灘区深田町4-1-1", access:"JR六甲道駅構内", notes:"" },
+  { id:64, area:"nada", name:"灘図書館", lat:34.7175, lng:135.2135, category:"公共施設", time:"9:30〜19:00（平日）、〜17:00（土日祝）", h24:false, features:["車椅子対応"], address:"神戸市灘区将来6-4-1", access:"六甲道駅徒歩5分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:65, area:"nada", name:"コープ六甲", lat:34.7220, lng:135.2235, category:"商業施設", time:"9:00〜21:00", h24:false, features:["車椅子対応","オストメイト","ウォシュレット"], address:"神戸市灘区六甲町4-1-1", access:"六甲駅徒歩3分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+
+  // ===== 兵庫区 =====
+  { id:70, area:"hyogo", name:"兵庫区文化センター", lat:34.6784, lng:135.1659, category:"公共施設", time:"9:00〜21:30", h24:false, features:["車椅子対応","オストメイト","ウォシュレット","介助ベッド"], address:"神戸市兵庫区羽坂通4-1-1", access:"大開駅徒歩5分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:71, area:"hyogo", name:"イオンモール神戸南", lat:34.6725, lng:135.1718, category:"商業施設", time:"9:00〜21:00", h24:false, features:["車椅子対応","オストメイト","ウォシュレット"], address:"神戸市兵庫区中之島2-1-1", access:"和田岬駅徒歩10分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:72, area:"hyogo", name:"兵庫区総合庁舎", lat:34.6810, lng:135.1648, category:"公共施設", time:"8:45〜17:30（平日）", h24:false, features:["車椅子対応","オストメイト","介助ベッド"], address:"神戸市兵庫区荒田町1-21-1", access:"湊川公園駅徒歩5分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:73, area:"hyogo", name:"湊川公園", lat:34.6836, lng:135.1698, category:"公共", time:"24時間", h24:true, features:["車椅子対応","多目的トイレ"], address:"神戸市兵庫区荒田町2丁目", access:"湊川公園駅すぐ", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:74, area:"hyogo", name:"兵庫図書館", lat:34.6776, lng:135.1666, category:"公共施設", time:"9:30〜19:00（平日）、〜17:00（土日祝）", h24:false, features:["車椅子対応"], address:"神戸市兵庫区大開通7-1-17", access:"大開駅徒歩5分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+
+  // ===== 長田区 =====
+  { id:80, area:"nagata", name:"ジョイプラザ（東急プラザ新長田）", lat:34.6705, lng:135.1460, category:"商業施設", time:"10:00〜21:00", h24:false, features:["車椅子対応","オストメイト","ウォシュレット","介助ベッド"], address:"神戸市長田区若松町5-5-1", access:"新長田駅すぐ", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:81, area:"nagata", name:"アスタプラザイースト", lat:34.6710, lng:135.1445, category:"商業施設", time:"10:00〜20:00", h24:false, features:["車椅子対応","オストメイト"], address:"神戸市長田区大橋町5-3-1", access:"新長田駅徒歩3分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:82, area:"nagata", name:"イオン長田南ショッピングセンター", lat:34.6678, lng:135.1520, category:"商業施設", time:"9:00〜21:00", h24:false, features:["車椅子対応","オストメイト","ウォシュレット","介助ベッド"], address:"神戸市長田区東尻池新町1-20", access:"駒ヶ林駅徒歩5分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:83, area:"nagata", name:"長田区役所", lat:34.6734, lng:135.1523, category:"公共施設", time:"8:45〜17:30（平日）", h24:false, features:["車椅子対応","オストメイト","介助ベッド"], address:"神戸市長田区大谷町2-5-1", access:"長田駅徒歩5分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:84, area:"nagata", name:"若松公園（鉄人28号広場）", lat:34.6702, lng:135.1482, category:"公共", time:"24時間", h24:true, features:["車椅子対応","多目的トイレ"], address:"神戸市長田区若松町6丁目", access:"新長田駅徒歩5分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+
+  // ===== 須磨区 =====
+  { id:90, area:"suma", name:"LUCCA名谷", lat:34.6590, lng:135.0825, category:"商業施設", time:"10:00〜21:00", h24:false, features:["車椅子対応","オストメイト","ウォシュレット","介助ベッド"], address:"神戸市須磨区中落合3-1-10", access:"名谷駅すぐ", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:91, area:"suma", name:"須磨パティオ1番館", lat:34.6593, lng:135.0828, category:"商業施設", time:"10:00〜20:00", h24:false, features:["車椅子対応","オストメイト","ウォシュレット","介助ベッド"], address:"神戸市須磨区中落合2-2-1", access:"名谷駅徒歩3分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:92, area:"suma", name:"須磨消防署", lat:34.6467, lng:135.1068, category:"公共施設", time:"24時間", h24:true, features:["車椅子対応","オストメイト","ウォシュレット","介助ベッド"], address:"神戸市須磨区中島町1-1-1", access:"須磨駅徒歩10分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:93, area:"suma", name:"須磨区役所", lat:34.6493, lng:135.1053, category:"公共施設", time:"8:45〜17:30（平日）", h24:false, features:["車椅子対応","オストメイト","介助ベッド"], address:"神戸市須磨区大黒町4-1-1", access:"須磨駅徒歩5分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:94, area:"suma", name:"須磨海浜公園", lat:34.6378, lng:135.1193, category:"公共", time:"24時間", h24:true, features:["車椅子対応","多目的トイレ"], address:"神戸市須磨区若宮町1丁目", access:"須磨海浜公園駅すぐ", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+
+  // ===== 垂水区 =====
+  { id:100, area:"tarumi", name:"コープ新多聞", lat:34.6428, lng:135.0610, category:"商業施設", time:"9:00〜21:00", h24:false, features:["車椅子対応","オストメイト"], address:"神戸市垂水区本多聞4-1-250", access:"学園都市駅徒歩10分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:101, area:"tarumi", name:"垂水消防署", lat:34.6288, lng:135.0552, category:"公共施設", time:"24時間", h24:true, features:["車椅子対応","オストメイト"], address:"神戸市垂水区舞多聞東1-10-30", access:"舞子駅から車で10分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:102, area:"tarumi", name:"垂水区役所", lat:34.6335, lng:135.0567, category:"公共施設", time:"8:45〜17:30（平日）", h24:false, features:["車椅子対応","オストメイト","介助ベッド"], address:"神戸市垂水区日向2-5-1", access:"垂水駅徒歩8分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:103, area:"tarumi", name:"エコール・リラ垂水", lat:34.6351, lng:135.0478, category:"商業施設", time:"10:00〜21:00", h24:false, features:["車椅子対応","オストメイト","ウォシュレット"], address:"神戸市垂水区東垂水2-3-1", access:"垂水駅直結", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:104, area:"tarumi", name:"舞子公園（明石海峡大橋記念館）", lat:34.6382, lng:135.0050, category:"公共", time:"9:00〜18:00", h24:false, features:["車椅子対応","多目的トイレ"], address:"神戸市垂水区舞子台8-8-1", access:"舞子駅徒歩2分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+
+  // ===== 北区 =====
+  { id:110, area:"kita", name:"しあわせの村 本館・宿泊館", lat:34.7290, lng:135.1420, category:"公共施設", time:"9:00〜21:00", h24:false, features:["車椅子対応","オストメイト","ウォシュレット","介助ベッド"], address:"神戸市北区しあわせの村1-1", access:"三宮からバスで30分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:111, area:"kita", name:"有馬の工房（有馬温泉観光交流センター）", lat:34.7980, lng:135.2468, category:"観光施設", time:"9:00〜17:00", h24:false, features:["車椅子対応","多目的トイレ"], address:"神戸市北区有馬町1019", access:"有馬温泉駅徒歩5分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:112, area:"kita", name:"太閤橋おもてなしトイレ", lat:34.7982, lng:135.2470, category:"公共", time:"24時間", h24:true, features:["車椅子対応","オストメイト"], address:"神戸市北区有馬町1262-1", access:"有馬温泉駅徒歩3分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:113, area:"kita", name:"ベルスト鈴蘭台・北区役所", lat:34.7504, lng:135.1540, category:"公共施設", time:"8:45〜17:30（平日）", h24:false, features:["車椅子対応","オストメイト","ウォシュレット","介助ベッド"], address:"神戸市北区鈴蘭台北町1-9-1", access:"鈴蘭台駅すぐ", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+
+  // ===== 西区 =====
+  { id:120, area:"nishi", name:"スーパーセンターイズミヤ 神戸玉津店", lat:34.6558, lng:135.0148, category:"商業施設", time:"9:00〜22:00", h24:false, features:["車椅子対応","オストメイト","ウォシュレット","介助ベッド"], address:"神戸市西区玉津町居住1-2", access:"西神中央駅からバス", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:121, area:"nishi", name:"西神中央駅", lat:34.6732, lng:135.0110, category:"駅", time:"始発〜終電", h24:false, features:["車椅子対応","オストメイト","多目的トイレ"], address:"神戸市西区糀台5-3", access:"西神中央駅構内", notes:"" },
+  { id:122, area:"nishi", name:"イオンモール神戸西", lat:34.6640, lng:135.0062, category:"商業施設", time:"9:00〜22:00", h24:false, features:["車椅子対応","オストメイト","ウォシュレット","介助ベッド"], address:"神戸市西区見津が丘6-1", access:"西神中央駅からバス10分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:123, area:"nishi", name:"西区役所", lat:34.6830, lng:135.0267, category:"公共施設", time:"8:45〜17:30（平日）", h24:false, features:["車椅子対応","オストメイト","介助ベッド"], address:"神戸市西区水押2-4-1", access:"西神中央駅徒歩10分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:124, area:"nishi", name:"神戸市立西図書館", lat:34.6835, lng:135.0270, category:"公共施設", time:"9:30〜19:00（平日）、〜17:00（土日祝）", h24:false, features:["車椅子対応"], address:"神戸市西区糀台6-2-2", access:"西神中央駅徒歩12分", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" },
+  { id:125, area:"nishi", name:"神戸市西区総合スポーツセンター", lat:34.6895, lng:135.0222, category:"公共施設", time:"9:00〜21:00", h24:false, features:["車椅子対応","オストメイト","ウォシュレット"], address:"神戸市西区神姫台4-8-1", access:"西神南駅すぐ", notes:"神戸市公式「こうべ・だれでもトイレ」登録施設" }
+];
+
+// ============================================================
+//  状態
+// ============================================================
+let map, userMarker, routeLayer, selectedMarker;
+let currentFilter = "all";
+let userLat = null, userLng = null;
+let selectedToilet = null;
+let markers = {};
+let panelOpen = false;
+
+// ============================================================
+//  地図初期化
+// ============================================================
+map = L.map("map", {
+  center: [34.6939, 135.1956],
+  zoom: 15,
+  zoomControl: true
+});
+
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  maxZoom: 19
+}).addTo(map);
+
+// ============================================================
+//  マーカー作成
+// ============================================================
+function createMarkerIcon(toilet, selected = false) {
+  const cls = [
+    "toilet-marker-icon",
+    toilet.h24 ? "h24" : "",
+    selected    ? "selected-marker" : ""
+  ].filter(Boolean).join(" ");
+  return L.divIcon({
+    className: "",
+    html: `<div class="${cls}" style="width:34px;height:34px">♿</div>`,
+    iconSize: [34, 34],
+    iconAnchor: [17, 17],
+    popupAnchor: [0, -20]
+  });
+}
+
+function addMarkers(toilets) {
+  toilets.forEach(t => {
+    const m = L.marker([t.lat, t.lng], { icon: createMarkerIcon(t) })
+      .addTo(map)
+      .on("click", () => openDetail(t));
+    markers[t.id] = m;
+  });
+}
+
+// ============================================================
+//  フィルタリング
+// ============================================================
+function getFiltered() {
+  return TOILETS.filter(t => {
+    if (currentFilter === "h24")     return t.h24;
+    if (currentFilter === "ostomy")  return t.features.includes("オストメイト");
+    if (currentFilter === "bed")     return t.features.includes("介助ベッド");
+    if (currentFilter === "washlet") return t.features.includes("ウォシュレット");
+    return true;
+  });
+}
+
+function refresh() {
+  Object.values(markers).forEach(m => map.removeLayer(m));
+  markers = {};
+  const filtered = getFiltered();
+  addMarkers(filtered);
+  renderList(filtered);
+}
+
+// ============================================================
+//  リスト描画
+// ============================================================
+const categoryColor = {
+  "駅":     "badge-blue",
+  "商業施設":"badge-green",
+  "公共":   "badge-amber",
+  "公共施設":"badge-teal",
+  "ビル":   "badge-red"
+};
+
+function renderList(toilets) {
+  const el = document.getElementById("toilet-list");
+  if (toilets.length === 0) {
+    el.innerHTML = `<p style="text-align:center;color:#999;padding:30px">該当する施設がありません</p>`;
+    return;
+  }
+  el.innerHTML = toilets.map(t => `
+    <div class="toilet-card" data-id="${t.id}" onclick="openDetail(TOILETS.find(x=>x.id==${t.id}))">
+      <div class="card-header">
+        <div class="toilet-icon">${t.h24 ? "🟢" : "♿"}</div>
+        <div class="card-info">
+          <div class="card-name">${t.name}</div>
+          <div class="card-access">${t.access}</div>
+        </div>
+      </div>
+      <div class="card-badges">
+        <span class="badge ${categoryColor[t.category] || 'badge-blue'}">${t.category}</span>
+        ${t.h24 ? '<span class="badge badge-green">24時間</span>' : ''}
+        ${t.features.includes("オストメイト") ? '<span class="badge badge-teal">オストメイト</span>' : ''}
+        ${t.features.includes("介助ベッド")   ? '<span class="badge badge-amber">介助ベッド</span>' : ''}
+        ${t.features.includes("ウォシュレット") ? '<span class="badge badge-blue">ウォシュレット</span>' : ''}
+      </div>
+    </div>
+  `).join("");
+}
+
+// ============================================================
+//  詳細パネル
+// ============================================================
+function openDetail(toilet) {
+  selectedToilet = toilet;
+
+  Object.entries(markers).forEach(([id, m]) => {
+    const t = TOILETS.find(x => x.id == id);
+    m.setIcon(createMarkerIcon(t, Number(id) === toilet.id));
+  });
+
+  map.setView([toilet.lat, toilet.lng], Math.max(map.getZoom(), 16), { animate: true });
+
+  document.getElementById("detail-name").textContent = toilet.name;
+  document.getElementById("detail-category").textContent = `${toilet.category} ／ ${AREAS[toilet.area]}`;
+
+  document.getElementById("detail-rows").innerHTML = `
+    <div class="detail-row">
+      <span class="detail-icon">🕐</span>
+      <span class="detail-label">利用時間</span>
+      <span class="detail-val">${toilet.time}</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-icon">📍</span>
+      <span class="detail-label">住所</span>
+      <span class="detail-val">${toilet.address}</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-icon">🚶</span>
+      <span class="detail-label">アクセス</span>
+      <span class="detail-val">${toilet.access}</span>
+    </div>
+    ${toilet.notes ? `
+    <div class="detail-row">
+      <span class="detail-icon">💡</span>
+      <span class="detail-label">備考</span>
+      <span class="detail-val">${toilet.notes}</span>
+    </div>` : ""}
+  `;
+
+  document.getElementById("detail-features").innerHTML =
+    toilet.features.map(f => `<span class="badge badge-blue">${f}</span>`).join("");
+
+  closeList();
+  document.getElementById("detail-panel").classList.add("open");
+  document.getElementById("overlay").classList.add("visible");
+}
+
+function closeDetail() {
+  document.getElementById("detail-panel").classList.remove("open");
+  document.getElementById("overlay").classList.remove("visible");
+  selectedToilet = null;
+}
+
+// ============================================================
+//  リストパネル開閉
+// ============================================================
+function toggleList() {
+  panelOpen = !panelOpen;
+  document.getElementById("bottom-panel").classList.toggle("open", panelOpen);
+}
+function closeList() {
+  panelOpen = false;
+  document.getElementById("bottom-panel").classList.remove("open");
+}
+
+// ============================================================
+//  現在地取得
+// ============================================================
+function locateUser() {
+  if (!navigator.geolocation) { showToast("位置情報が使えません"); return; }
+  showToast("現在地を取得中…");
+  navigator.geolocation.getCurrentPosition(pos => {
+    userLat = pos.coords.latitude;
+    userLng = pos.coords.longitude;
+
+    if (userMarker) map.removeLayer(userMarker);
+    const userIcon = L.divIcon({
+      className: "",
+      html: `<div class="user-marker"></div>`,
+      iconSize: [18, 18],
+      iconAnchor: [9, 9]
+    });
+    userMarker = L.marker([userLat, userLng], { icon: userIcon, zIndexOffset: 1000 }).addTo(map);
+    map.setView([userLat, userLng], 16, { animate: true });
+    showToast("現在地を取得しました ✓");
+  }, () => {
+    showToast("位置情報を取得できませんでした");
+  });
+}
+
+// ============================================================
+//  ルート描画（OSRM 無料API → フォールバック直線）
+// ============================================================
+async function drawRoute() {
+  if (!selectedToilet) { showToast("トイレを選択してください"); return; }
+  if (userLat === null) { showToast("まず「📍」ボタンで現在地を取得してください"); return; }
+
+  if (routeLayer) map.removeLayer(routeLayer);
+  showToast("ルートを計算中…");
+
+  const url = `https://router.project-osrm.org/route/v1/foot/` +
+    `${userLng},${userLat};${selectedToilet.lng},${selectedToilet.lat}` +
+    `?overview=full&geometries=geojson`;
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.code !== "Ok") throw new Error("OSRM error");
+    const coords = data.routes[0].geometry.coordinates.map(([lng, lat]) => [lat, lng]);
+    routeLayer = L.polyline(coords, {
+      color: "#e53935",
+      weight: 5,
+      opacity: 0.85,
+      lineJoin: "round",
+      lineCap: "round"
+    }).addTo(map);
+    map.fitBounds(routeLayer.getBounds(), { padding: [40, 40] });
+
+    const dist = (data.routes[0].distance / 1000).toFixed(2);
+    const min  = Math.ceil(data.routes[0].duration / 60);
+    showToast(`🔴 徒歩約${min}分（${dist}km）`);
+  } catch {
+    routeLayer = L.polyline(
+      [[userLat, userLng], [selectedToilet.lat, selectedToilet.lng]],
+      { color: "#e53935", weight: 4, opacity: 0.7, dashArray: "10,8" }
+    ).addTo(map);
+    map.fitBounds(routeLayer.getBounds(), { padding: [40, 40] });
+    showToast("⚠ 直線ルートを表示（概算）");
+  }
+
+  closeDetail();
+}
+
+// ============================================================
+//  トースト
+// ============================================================
+let toastTimer;
+function showToast(msg) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove("show"), 3000);
+}
+
+// ============================================================
+//  イベント
+// ============================================================
+document.querySelectorAll(".filter-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentFilter = btn.dataset.filter;
+    refresh();
+  });
+});
+
+document.querySelectorAll(".area-btn:not(.coming-soon)").forEach(btn => {
+  btn.addEventListener("click", () => {
+    showToast(`${btn.textContent.trim()} エリアへ移動`);
+    const areaToilets = TOILETS.filter(t => t.area === btn.dataset.area);
+    if (areaToilets.length > 0) {
+      const lats = areaToilets.map(t => t.lat);
+      const lngs = areaToilets.map(t => t.lng);
+      const bounds = L.latLngBounds(
+        [Math.min(...lats), Math.min(...lngs)],
+        [Math.max(...lats), Math.max(...lngs)]
+      );
+      map.fitBounds(bounds, { padding: [40, 40] });
+    }
+  });
+});
+
+document.getElementById("btn-locate").addEventListener("click", locateUser);
+document.getElementById("btn-list").addEventListener("click", toggleList);
+document.getElementById("panel-handle").addEventListener("click", toggleList);
+document.getElementById("detail-handle").addEventListener("click", closeDetail);
+document.getElementById("btn-close-detail").addEventListener("click", closeDetail);
+document.getElementById("btn-route").addEventListener("click", drawRoute);
+document.getElementById("overlay").addEventListener("click", () => {
+  closeDetail();
+  closeList();
+});
+
+map.on("click", () => {
+  if (routeLayer && !selectedToilet) {
+    map.removeLayer(routeLayer);
+    routeLayer = null;
+  }
+});
+
+// ============================================================
+//  初期化
+// ============================================================
+refresh();
+renderList(TOILETS);
+document.getElementById("bottom-panel").style.transform = "translateY(calc(100% - 56px))";
+</script>
+
+</body>
+</html>
