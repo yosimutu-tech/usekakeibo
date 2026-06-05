@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>家庭料理レシピ集</title>
+<style>
+  :root {
+    --navy:  #16365C;
+    --gold:  #F4A300;
+    --bg:    #FBF8F1;
+    --white: #FFFFFF;
+    --text:  #2D2D2D;
+    --muted: #5A6370;
+    --shadow: 0 4px 20px rgba(22,54,92,.10);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans JP",
+                 "Meiryo", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, var(--navy) 0%, #1E4A7A 50%, var(--gold) 100%);
+    padding: 80px 24px 72px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 70% 30%, rgba(244,163,0,.18) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    display: inline-block;
+    border: 1.5px solid rgba(244,163,0,.7);
+    color: var(--gold);
+    font-size: 12px;
+    letter-spacing: .18em;
+    padding: 4px 16px;
+    border-radius: 20px;
+    margin-bottom: 24px;
+  }
+  .hero h1 {
+    color: var(--white);
+    font-size: clamp(26px, 5vw, 46px);
+    font-weight: 800;
+    line-height: 1.25;
+    margin-bottom: 16px;
+  }
+  .hero h1 em {
+    font-style: normal;
+    color: var(--gold);
+  }
+  .hero-emoji {
+    font-size: 36px;
+    letter-spacing: 12px;
+    margin-bottom: 20px;
+    display: block;
+  }
+  .hero-sub {
+    color: rgba(255,255,255,.80);
+    font-size: 17px;
+    margin-bottom: 36px;
+  }
+  .btn {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--navy);
+    font-size: 17px;
+    font-weight: 700;
+    padding: 16px 48px;
+    border-radius: 50px;
+    text-decoration: none;
+    letter-spacing: .05em;
+    box-shadow: 0 6px 24px rgba(244,163,0,.45);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(244,163,0,.55);
+  }
+
+  /* ── SECTION WRAPPER ── */
+  .section {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 64px 20px;
+  }
+  .section-label {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .2em;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .section-title {
+    text-align: center;
+    font-size: clamp(20px, 3vw, 28px);
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 40px;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, #D9D3C5, transparent);
+    margin: 0 auto;
+    max-width: 600px;
+  }
+
+  /* ── CATEGORY GRID ── */
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .category-card {
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 28px 24px;
+    text-align: center;
+    border-top: 4px solid var(--gold);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .category-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 28px rgba(22,54,92,.15);
+  }
+  .category-emoji {
+    font-size: 44px;
+    line-height: 1;
+    margin-bottom: 12px;
+    display: block;
+  }
+  .category-card h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+  .category-card p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+
+  /* ── RECIPE CARD GRID ── */
+  .recipe-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .recipe-card {
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: transform .15s, box-shadow .15s;
+  }
+  .recipe-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 28px rgba(22,54,92,.15);
+  }
+  .recipe-thumb {
+    height: 84px;
+    background: linear-gradient(135deg, #1E4A7A 0%, #2A6094 60%, rgba(244,163,0,.4) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+  }
+  .recipe-body {
+    padding: 18px 20px 22px;
+  }
+  .recipe-tag {
+    display: inline-block;
+    background: #FFF8E8;
+    color: var(--gold);
+    border: 1px solid #F4D080;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    margin-bottom: 10px;
+    letter-spacing: .04em;
+  }
+  .recipe-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+  .recipe-meta {
+    display: flex;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .recipe-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* ── DETAIL CARD ── */
+  .card {
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 32px 36px;
+  }
+  .section-heading {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+  .badge {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    background: var(--gold);
+    border-radius: 50%;
+    color: var(--white);
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .section-heading h3 {
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+
+  /* ── DETAIL INFO BAR ── */
+  .detail-infobar {
+    display: flex;
+    flex-wrap: wrap;
+    background: var(--navy);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 32px;
+  }
+  .detail-stat {
+    flex: 1;
+    text-align: center;
+    padding: 18px 12px;
+    border-right: 1px solid rgba(255,255,255,.15);
+    min-width: 80px;
+  }
+  .detail-stat:last-child {
+    border-right: none;
+  }
+  .detail-stat-label {
+    font-size: 11px;
+    letter-spacing: .1em;
+    color: rgba(255,255,255,.6);
+    margin-bottom: 4px;
+  }
+  .detail-stat-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1.2;
+  }
+  .detail-stat-value em {
+    color: var(--gold);
+    font-style: normal;
+    font-size: 14px;
+    margin-left: 2px;
+  }
+
+  /* ── INGREDIENTS GRID ── */
+  .ingredients-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 40px;
+    margin-bottom: 8px;
+  }
+  .ingredient-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 0;
+    border-bottom: 1px solid #EDE9E0;
+    font-size: 14.5px;
+  }
+  .ingredient-name {
+    color: var(--text);
+  }
+  .ingredient-amount {
+    color: var(--navy);
+    font-weight: 600;
+    white-space: nowrap;
+    margin-left: 12px;
+  }
+
+  /* ── STEPS ── */
+  .steps-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .step-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px 0;
+    border-bottom: 1px solid #EDE9E0;
+  }
+  .step-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  .step-badge {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    background: var(--gold);
+    border-radius: 50%;
+    color: var(--white);
+    font-size: 15px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+  }
+  .step-content {
+    flex: 1;
+  }
+  .step-content h4 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 5px;
+  }
+  .step-content p {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.75;
+  }
+
+  /* ── TIPS (reuse points-grid pattern) ── */
+  .points-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .point-card {
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 32px 24px 28px;
+    text-align: center;
+    position: relative;
+    border-top: 4px solid var(--gold);
+  }
+  .point-emoji {
+    font-size: 40px;
+    line-height: 1;
+    margin-bottom: 14px;
+  }
+  .point-num {
+    position: absolute;
+    top: -1px;
+    left: 22px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    color: var(--gold);
+  }
+  .point-card h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 10px;
+    line-height: 1.4;
+  }
+  .point-card p {
+    font-size: 13.5px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: #0E243D;
+    color: rgba(255,255,255,.45);
+    text-align: center;
+    padding: 22px 16px;
+    font-size: 12.5px;
+    letter-spacing: .04em;
+  }
+  footer span { color: var(--gold); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .hero { padding: 60px 20px 56px; }
+    .btn { padding: 14px 36px; font-size: 16px; }
+    .category-grid { grid-template-columns: 1fr; }
+    .recipe-grid { grid-template-columns: 1fr; }
+    .points-grid { grid-template-columns: 1fr; }
+    .card { padding: 22px 18px; }
+    .ingredients-grid { grid-template-columns: 1fr; gap: 0; }
+    .detail-stat { min-width: 45%; }
+    .detail-infobar { border-radius: 10px; }
+  }
+
+  /* ── PRINT ── */
+  @media print {
+    .hero, .detail-infobar, .point-card, footer {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .btn { display: none; }
+    .hero { padding: 48px 24px; }
+    .section { padding: 32px 0; }
+    body { font-size: 12px; }
+    .recipe-thumb { height: 56px; }
+    .divider { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-eyebrow">RECIPE BOOK ／ 和の食卓</div>
+  <h1>家庭料理<br><em>レシピ集</em></h1>
+  <span class="hero-emoji">🍚&nbsp;🍜&nbsp;🍛&nbsp;🥢&nbsp;🍱</span>
+  <p class="hero-sub">旬の食材を活かした、毎日の食卓を彩る全96品</p>
+  <a href="#recipes" class="btn">レシピを見る</a>
+</section>
+
+<!-- ── CATEGORIES ── -->
+<section class="section" id="categories">
+  <p class="section-label">CATEGORIES</p>
+  <h2 class="section-title">料理カテゴリー</h2>
+
+  <div class="category-grid">
+    <div class="category-card">
+      <span class="category-emoji">🍱</span>
+      <h3>和食</h3>
+      <p>だしの旨みを活かした、心に沁みる日本の家庭料理。煮物・焼き魚・丼ぶりなど定番を網羅。</p>
+    </div>
+    <div class="category-card">
+      <span class="category-emoji">🍝</span>
+      <h3>洋食</h3>
+      <p>バターとハーブが香る、食卓を華やかにする西洋料理。パスタ・グラタン・ハンバーグが揃う。</p>
+    </div>
+    <div class="category-card">
+      <span class="category-emoji">🥟</span>
+      <h3>中華</h3>
+      <p>香辛料と強火が生み出す、本格中華の家庭版レシピ。餃子・チャーハン・麻婆豆腐を収録。</p>
+    </div>
+    <div class="category-card">
+      <span class="category-emoji">🍲</span>
+      <h3>スープ</h3>
+      <p>野菜と肉のエキスが溶け込む、体を温めるひと皿。豚汁・ポトフ・コーンスープなど季節別に。</p>
+    </div>
+    <div class="category-card">
+      <span class="category-emoji">🥘</span>
+      <h3>おかず</h3>
+      <p>毎日食べたい、栄養バランスのとれた定番おかず。肉・魚・野菜を使った副菜レシピも充実。</p>
+    </div>
+    <div class="category-card">
+      <span class="category-emoji">🍮</span>
+      <h3>デザート</h3>
+      <p>季節のフルーツや乳製品を使った、甘いひととき。プリン・ムース・焼き菓子まで幅広く紹介。</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── FEATURED RECIPES ── -->
+<section class="section" id="recipes">
+  <p class="section-label">FEATURED RECIPES</p>
+  <h2 class="section-title">おすすめレシピ</h2>
+
+  <div class="recipe-grid">
+
+    <div class="recipe-card">
+      <div class="recipe-thumb">🍛</div>
+      <div class="recipe-body">
+        <div class="recipe-tag">洋食</div>
+        <h3 class="recipe-name">チキンカレー</h3>
+        <div class="recipe-meta">
+          <span>⏱ 45分</span>
+          <span>👥 4人前</span>
+          <span>★ 普通</span>
+        </div>
+        <p class="recipe-desc">スパイスの香りが食欲をそそる週末の定番。鶏もも肉をじっくり煮込んだコク深い一皿です。</p>
+      </div>
+    </div>
+
+    <div class="recipe-card">
+      <div class="recipe-thumb">🍜</div>
+      <div class="recipe-body">
+        <div class="recipe-tag">和食</div>
+        <h3 class="recipe-name">醤油ラーメン</h3>
+        <div class="recipe-meta">
+          <span>⏱ 30分</span>
+          <span>👥 2人前</span>
+          <span>★ 簡単</span>
+        </div>
+        <p class="recipe-desc">鶏がらと煮干しで取った澄んだスープが自慢。自宅で本格的な醤油ラーメンを楽しめます。</p>
+      </div>
+    </div>
+
+    <div class="recipe-card">
+      <div class="recipe-thumb">🥟</div>
+      <div class="recipe-body">
+        <div class="recipe-tag">中華</div>
+        <h3 class="recipe-name">焼き餃子</h3>
+        <div class="recipe-meta">
+          <span>⏱ 50分</span>
+          <span>👥 3人前</span>
+          <span>★ 普通</span>
+        </div>
+        <p class="recipe-desc">ニラとキャベツたっぷり、皮はパリッと中はジューシー。手作りならではのおいしさです。</p>
+      </div>
+    </div>
+
+    <div class="recipe-card">
+      <div class="recipe-thumb">🍲</div>
+      <div class="recipe-body">
+        <div class="recipe-tag">スープ</div>
+        <h3 class="recipe-name">豚汁</h3>
+        <div class="recipe-meta">
+          <span>⏱ 25分</span>
+          <span>👥 4人前</span>
+          <span>★ 簡単</span>
+        </div>
+        <p class="recipe-desc">根菜と豚バラの旨みが溶け出す、体が温まる具だくさんの味噌汁。寒い日の定番です。</p>
+      </div>
+    </div>
+
+    <div class="recipe-card">
+      <div class="recipe-thumb">🍳</div>
+      <div class="recipe-body">
+        <div class="recipe-tag">和食</div>
+        <h3 class="recipe-name">親子丼</h3>
+        <div class="recipe-meta">
+          <span>⏱ 20分</span>
+          <span>👥 2人前</span>
+          <span>★ 簡単</span>
+        </div>
+        <p class="recipe-desc">ふわとろ卵と鶏肉の黄金コンビ。甘辛だしが絡んだ、誰もが愛する丼ぶりです。</p>
+      </div>
+    </div>
+
+    <div class="recipe-card">
+      <div class="recipe-thumb">🍮</div>
+      <div class="recipe-body">
+        <div class="recipe-tag">デザート</div>
+        <h3 class="recipe-name">なめらかプリン</h3>
+        <div class="recipe-meta">
+          <span>⏱ 60分</span>
+          <span>👥 4人前</span>
+          <span>★ 普通</span>
+        </div>
+        <p class="recipe-desc">卵とミルクだけで作る、とろける口溶けのカスタードプリン。苦みのあるカラメルが決め手。</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── RECIPE DETAIL ── -->
+<section class="section" id="detail">
+  <p class="section-label">RECIPE DETAIL</p>
+  <h2 class="section-title">チキンカレー 🍛</h2>
+
+  <div class="card">
+
+    <!-- INFO BAR -->
+    <div class="detail-infobar">
+      <div class="detail-stat">
+        <div class="detail-stat-label">調理時間</div>
+        <div class="detail-stat-value">45<em>分</em></div>
+      </div>
+      <div class="detail-stat">
+        <div class="detail-stat-label">準備時間</div>
+        <div class="detail-stat-value">15<em>分</em></div>
+      </div>
+      <div class="detail-stat">
+        <div class="detail-stat-label">人数</div>
+        <div class="detail-stat-value">4<em>人前</em></div>
+      </div>
+      <div class="detail-stat">
+        <div class="detail-stat-label">難易度</div>
+        <div class="detail-stat-value"><em>普通</em></div>
+      </div>
+    </div>
+
+    <!-- INGREDIENTS -->
+    <div class="section-heading">
+      <div class="badge">材</div>
+      <h3>材料（4人前）</h3>
+    </div>
+
+    <div class="ingredients-grid">
+      <div class="ingredient-row">
+        <span class="ingredient-name">鶏もも肉</span>
+        <span class="ingredient-amount">500g</span>
+      </div>
+      <div class="ingredient-row">
+        <span class="ingredient-name">カレールウ</span>
+        <span class="ingredient-amount">4かけ（約100g）</span>
+      </div>
+      <div class="ingredient-row">
+        <span class="ingredient-name">玉ねぎ</span>
+        <span class="ingredient-amount">2個</span>
+      </div>
+      <div class="ingredient-row">
+        <span class="ingredient-name">水</span>
+        <span class="ingredient-amount">700ml</span>
+      </div>
+      <div class="ingredient-row">
+        <span class="ingredient-name">じゃがいも</span>
+        <span class="ingredient-amount">2個</span>
+      </div>
+      <div class="ingredient-row">
+        <span class="ingredient-name">サラダ油</span>
+        <span class="ingredient-amount">大さじ2</span>
+      </div>
+      <div class="ingredient-row">
+        <span class="ingredient-name">にんじん</span>
+        <span class="ingredient-amount">1本</span>
+      </div>
+      <div class="ingredient-row">
+        <span class="ingredient-name">おろしにんにく</span>
+        <span class="ingredient-amount">小さじ1</span>
+      </div>
+      <div class="ingredient-row">
+        <span class="ingredient-name">おろし生姜</span>
+        <span class="ingredient-amount">小さじ1</span>
+      </div>
+      <div class="ingredient-row">
+        <span class="ingredient-name">塩・コショウ</span>
+        <span class="ingredient-amount">少々</span>
+      </div>
+    </div>
+
+    <!-- STEPS -->
+    <div class="section-heading" style="margin-top: 36px;">
+      <div class="badge">順</div>
+      <h3>作り方</h3>
+    </div>
+
+    <ol class="steps-list">
+      <li class="step-item">
+        <div class="step-badge">1</div>
+        <div class="step-content">
+          <h4>下ごしらえ</h4>
+          <p>鶏もも肉はひと口大に切り、塩・コショウで下味をつけます。玉ねぎはくし切り、じゃがいもとにんじんは乱切りにしておきます。</p>
+        </div>
+      </li>
+      <li class="step-item">
+        <div class="step-badge">2</div>
+        <div class="step-content">
+          <h4>香味野菜を炒める</h4>
+          <p>フライパンにサラダ油を中火で熱し、おろしにんにく・生姜を入れて香りが立つまで炒めます。鶏肉を加えて表面に焼き色がつくまで炒めます。</p>
+        </div>
+      </li>
+      <li class="step-item">
+        <div class="step-badge">3</div>
+        <div class="step-content">
+          <h4>野菜を加えて炒める</h4>
+          <p>玉ねぎを加えてしんなりするまで5分ほど炒め、じゃがいもとにんじんも加えてさらに2分炒めます。全体に油が回ればOKです。</p>
+        </div>
+      </li>
+      <li class="step-item">
+        <div class="step-badge">4</div>
+        <div class="step-content">
+          <h4>煮込む</h4>
+          <p>水700mlを加えて強火で沸騰させ、表面に浮いてきたアクを丁寧に取り除きます。弱中火に落とし、蓋をして15分ほど煮込みます。</p>
+        </div>
+      </li>
+      <li class="step-item">
+        <div class="step-badge">5</div>
+        <div class="step-content">
+          <h4>ルウを溶かす</h4>
+          <p>一度火を止め、カレールウを割り入れます。完全に溶けるまでよく混ぜてから再び弱火にかけ、とろみがつくまで10分ほど煮ます。</p>
+        </div>
+      </li>
+      <li class="step-item">
+        <div class="step-badge">6</div>
+        <div class="step-content">
+          <h4>仕上げ・盛り付け</h4>
+          <p>味を見て塩で調整します。温かいご飯の上にたっぷりかけて完成です。お好みで福神漬けや生クリームをトッピングしても。</p>
+        </div>
+      </li>
+    </ol>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── TIPS ── -->
+<section class="section" id="tips">
+  <p class="section-label">COOKING TIPS</p>
+  <h2 class="section-title">料理のポイント</h2>
+
+  <div class="points-grid">
+    <div class="point-card">
+      <div class="point-num">POINT 1</div>
+      <div class="point-emoji">🔥</div>
+      <h3>強火と弱火を<br>使い分ける</h3>
+      <p>炒める工程は強火で素早く、煮込む工程は弱火でじっくり。火加減ひとつで味の深みが格段に変わります。</p>
+    </div>
+    <div class="point-card">
+      <div class="point-num">POINT 2</div>
+      <div class="point-emoji">🧄</div>
+      <h3>香味野菜は<br>最初に炒める</h3>
+      <p>にんにく・生姜・玉ねぎを先に炒めることで、料理全体の香りとコクが格段にアップします。焦がさないよう注意。</p>
+    </div>
+    <div class="point-card">
+      <div class="point-num">POINT 3</div>
+      <div class="point-emoji">⏰</div>
+      <h3>アクは丁寧に<br>取り除く</h3>
+      <p>沸騰直後に浮いてくるアクを取ることで、澄んだスープと雑味のないすっきりした仕上がりになります。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  Produced with Claude Code ✦ 監修：<span>家庭料理研究会</span>
+</footer>
+
+</body>
+</html>
