@@ -1,0 +1,18 @@
+{
+  "name": "四柱推命占い",
+  "short_name": "四柱推命",
+  "description": "生年月日から運命の四柱を読み解く占いアプリ",
+  "start_url": "shichusumei.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#07041a",
+  "theme_color": "#07041a",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
