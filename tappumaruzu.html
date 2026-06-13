@@ -82,21 +82,26 @@ body{
 .bunny-wrap{
   position:relative;
   z-index:2;
-  text-align:center;
-  margin-bottom:-10px;
-}
-.bunny-cloud{
-  font-size:7rem;
-  display:block;
-  filter:brightness(1.8) saturate(0.2);
+  width:220px;
+  height:130px;
+  margin:0 auto -10px;
   animation:float-cloud 3s ease-in-out infinite alternate;
 }
 @keyframes float-cloud{from{transform:translateY(0)}to{transform:translateY(-8px)}}
+.bunny-cloud{
+  position:absolute;
+  bottom:0;left:50%;
+  transform:translateX(-50%);
+  font-size:9rem;
+  line-height:1;
+  filter:brightness(1.9) saturate(0.15);
+}
 .bunny-emoji{
-  font-size:5.2rem;
-  display:block;
-  margin-top:-38px;
-  animation:float-cloud 3s ease-in-out infinite alternate;
+  position:absolute;
+  bottom:38px;left:50%;
+  transform:translateX(-50%);
+  font-size:4.2rem;
+  line-height:1;
 }
 
 /* 山のシルエット */
@@ -276,8 +281,9 @@ header{
   padding:18px 18px 0;position:relative;min-height:200px;
   display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
 }
-.end-bunny{font-size:4rem;position:relative;z-index:2;animation:float-cloud 3s ease-in-out infinite alternate}
-.end-bunny-cloud{font-size:5.5rem;display:block;margin-top:-28px;filter:brightness(1.8) saturate(.2);animation:float-cloud 3s ease-in-out infinite alternate}
+.end-bunny-wrap{position:relative;width:200px;height:120px;margin:0 auto -8px;animation:float-cloud 3s ease-in-out infinite alternate}
+.end-bunny{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);font-size:3.8rem;line-height:1}
+.end-bunny-cloud{position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:8rem;line-height:1;filter:brightness(1.9) saturate(.15)}
 .end-mt{position:absolute;bottom:0}
 .end-mt1{width:0;height:0;border-left:80px solid transparent;border-right:80px solid transparent;border-bottom:90px solid #1a4a25;left:50%;transform:translateX(-50%)}
 .end-mt2{width:0;height:0;border-left:60px solid transparent;border-right:60px solid transparent;border-bottom:75px solid #163d1f;right:8%}
@@ -329,8 +335,8 @@ header{
       </div>
       <!-- うさぎ -->
       <div class="bunny-wrap">
-        <span class="bunny-emoji">🐰</span>
         <span class="bunny-cloud">☁️</span>
+        <span class="bunny-emoji">🐰</span>
       </div>
       <!-- 木 -->
       <div class="card-trees">🌲🌲</div>
@@ -408,9 +414,9 @@ header{
         <div class="mt2"></div>
       </div>
       <!-- パンダ -->
-      <div class="bunny-wrap" style="margin-bottom:-8px">
-        <span class="end-bunny">🐼</span>
+      <div class="end-bunny-wrap">
         <span class="end-bunny-cloud">☁️</span>
+        <span class="end-bunny">🐼</span>
       </div>
     </div>
     <div class="end-grass">
