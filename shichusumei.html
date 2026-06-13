@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>四柱推命占い</title>
+<style>
+:root {
+  --bg: #07041a;
+  --card: #100c28;
+  --card2: #0d0920;
+  --border: #2d1a6e;
+  --gold: #c9a84c;
+  --gold-l: #f0d080;
+  --red: #cc4444;
+  --text: #e8d5b7;
+  --dim: #8070a8;
+  --wood: #56ab2f;
+  --fire: #e74c3c;
+  --earth: #e67e22;
+  --metal: #9b9db8;
+  --water: #2980b9;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Hiragino Sans','Yu Gothic UI','Meiryo',sans-serif;background:var(--bg);color:var(--text)}
+body{max-width:480px;margin:0 auto;position:relative}
+header{background:linear-gradient(160deg,#140840,#200e50);padding:18px 16px 14px;text-align:center;border-bottom:1px solid var(--border)}
+header h1{font-size:1.6rem;color:var(--gold-l);letter-spacing:.15em;text-shadow:0 0 18px rgba(201,168,76,.6)}
+header p{font-size:.72rem;color:var(--dim);margin-top:3px}
+.content{padding:14px 14px 80px}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.tab-nav{display:flex;background:#09061c;border-top:1px solid var(--border);position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;z-index:100}
+.tab-btn{flex:1;padding:9px 4px 7px;background:none;border:none;color:var(--dim);font-size:.68rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:color .2s;font-family:inherit}
+.tab-btn .ic{font-size:1.3rem}
+.tab-btn.active{color:var(--gold)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px}
+.card h2{font-size:.95rem;color:var(--gold);margin-bottom:13px;padding-bottom:8px;border-bottom:1px solid var(--border);letter-spacing:.05em}
+.form-row{margin-bottom:11px}
+label{display:block;font-size:.78rem;color:var(--dim);margin-bottom:5px}
+.date-grid{display:grid;grid-template-columns:2.5fr 1.2fr 1.2fr;gap:7px}
+input,select{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:9px 11px;font-size:.88rem;font-family:inherit;outline:none}
+input:focus,select:focus{border-color:var(--gold)}
+.radio-row{display:flex;gap:16px}
+.rl{display:flex;align-items:center;gap:5px;cursor:pointer;font-size:.88rem}
+input[type=radio]{width:auto;accent-color:var(--gold)}
+.btn{width:100%;padding:13px;background:linear-gradient(135deg,#6b2285,#3d1060);border:1px solid var(--gold);border-radius:10px;color:var(--gold-l);font-size:1rem;font-family:inherit;cursor:pointer;letter-spacing:.07em;transition:all .2s;margin-top:4px}
+.btn:hover{background:linear-gradient(135deg,#7d2895,#4d1878)}
+.btn-sm{width:auto;padding:8px 18px;font-size:.82rem;margin-top:0}
+.hidden{display:none}
+.pillars{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:12px 0}
+.pcol{text-align:center}
+.plabel{font-size:.68rem;color:var(--dim);margin-bottom:5px}
+.pbox{background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:10px 5px 8px;position:relative}
+.pbox.day-box{border-color:var(--gold);box-shadow:0 0 10px rgba(201,168,76,.25)}
+.sten{font-size:1.7rem;font-weight:700;display:block;line-height:1.15}
+.sbranch{font-size:1.4rem;font-weight:700;display:block;line-height:1.2;margin-top:3px}
+.etag{font-size:.6rem;padding:2px 5px;border-radius:8px;display:inline-block;margin-top:3px;font-weight:600}
+.tgod{font-size:.58rem;color:var(--dim);margin-top:3px;display:block}
+.tgod-self{color:var(--gold);font-weight:600}
+.ebars{margin:10px 0}
+.ebar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.ename{width:18px;text-align:center;font-size:.88rem;font-weight:700}
+.ebar-bg{flex:1;height:14px;background:var(--card2);border-radius:7px;overflow:hidden;border:1px solid var(--border)}
+.ebar-fill{height:100%;border-radius:7px;transition:width .6s ease}
+.ecount{width:18px;text-align:right;font-size:.75rem;color:var(--dim)}
+.fitem{background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:12px;margin-bottom:9px}
+.fitem h3{font-size:.83rem;color:var(--gold);margin-bottom:6px}
+.fitem p{font-size:.8rem;line-height:1.65;color:var(--text)}
+.badge{display:inline-block;padding:2px 10px;border-radius:10px;font-size:.68rem;font-weight:600;margin-right:5px}
+.daiyun-list{display:flex;overflow-x:auto;gap:8px;padding-bottom:8px;margin:10px 0}
+.dy-item{min-width:70px;text-align:center;background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:10px 8px;flex-shrink:0}
+.dy-age{font-size:.62rem;color:var(--dim);margin-bottom:4px}
+.dy-ks{font-size:1.2rem;font-weight:700}
+.compat-score{text-align:center;padding:16px 0}
+.score-ring{width:96px;height:96px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:1.8rem;font-weight:700;color:var(--gold-l);border:3px solid var(--gold);background:radial-gradient(circle,#200d50,#0d0920)}
+.score-label{font-size:.78rem;color:var(--dim)}
+.compat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.compat-box{text-align:center;background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:10px}
+.compat-box .title{font-size:.68rem;color:var(--dim);margin-bottom:5px}
+.compat-box .val{font-size:1.2rem;font-weight:700;color:var(--gold-l)}
+hr.divider{border:none;border-top:1px solid var(--border);margin:14px 0}
+.note{font-size:.67rem;color:var(--dim);text-align:center;margin-top:8px;line-height:1.5}
+.stars{color:var(--gold)}
+.alert{background:#1a0a0a;border:1px solid var(--red);border-radius:8px;padding:10px;font-size:.8rem;color:#e88;margin-bottom:10px}
+.section-title{font-size:.85rem;color:var(--gold);margin:14px 0 8px;letter-spacing:.05em;border-left:3px solid var(--gold);padding-left:8px}
+</style>
+</head>
+<body>
+<header>
+  <h1>四柱推命</h1>
+  <p>生年月日から運命の四柱を読み解く</p>
+</header>
+
+<main class="content">
+<div id="tab-meirei" class="tab-panel active">
+  <div class="card">
+    <h2>🔮 生年月日を入力</h2>
+    <div class="form-row">
+      <label>お名前（任意）</label>
+      <input type="text" id="name" placeholder="例：山田 太郎">
+    </div>
+    <div class="form-row">
+      <label>生年月日</label>
+      <div class="date-grid">
+        <input type="number" id="year" placeholder="年（例：1990）" min="1900" max="2024">
+        <input type="number" id="month" placeholder="月" min="1" max="12">
+        <input type="number" id="day" placeholder="日" min="1" max="31">
+      </div>
+    </div>
+    <div class="form-row">
+      <label>生まれ時刻（任意・時柱算出）</label>
+      <input type="number" id="hour" placeholder="時（0〜23、不明の場合は空欄）" min="0" max="23">
+    </div>
+    <div class="form-row">
+      <label>性別</label>
+      <div class="radio-row">
+        <label class="rl"><input type="radio" name="gender" value="m" checked> 男性</label>
+        <label class="rl"><input type="radio" name="gender" value="f"> 女性</label>
+      </div>
+    </div>
+    <button class="btn" onclick="calculate()">◎ 命式を算出する</button>
+  </div>
+
+  <div id="result" class="hidden">
+    <div class="card">
+      <h2 id="res-name">命式表</h2>
+      <div class="pillars" id="pillars-table"></div>
+      <div class="note" id="solar-note"></div>
+    </div>
+    <div class="card">
+      <h2>五行バランス</h2>
+      <div class="ebars" id="elem-bars"></div>
+      <div id="elem-comment" style="font-size:.78rem;color:var(--dim);line-height:1.6;margin-top:8px"></div>
+    </div>
+    <div class="card">
+      <h2>大運（10年ごとの運気）</h2>
+      <div id="daiyun-start" style="font-size:.78rem;color:var(--dim);margin-bottom:6px"></div>
+      <div class="daiyun-list" id="daiyun-list"></div>
+    </div>
+    <div style="text-align:center;margin-bottom:16px">
+      <button class="btn btn-sm" onclick="switchTab('kaisetsu')">📜 詳しい解説を見る →</button>
+    </div>
+  </div>
+</div>
+
+<div id="tab-kaisetsu" class="tab-panel">
+  <div id="kaisetsu-empty" class="card">
+    <p style="text-align:center;color:var(--dim);padding:20px 0;font-size:.9rem">
+      まず「命式」タブで生年月日を入力してください
+    </p>
+  </div>
+  <div id="kaisetsu-content" class="hidden">
+    <div class="card" id="kai-daishuu"></div>
+    <div class="card" id="kai-gokyo"></div>
+    <div class="card" id="kai-nenun"></div>
+  </div>
+</div>
+
+<div id="tab-aisei" class="tab-panel">
+  <div class="card">
+    <h2>💕 相性占い</h2>
+    <p class="section-title">あなた（Aさん）</p>
+    <div class="date-grid" style="margin-bottom:10px">
+      <input type="number" id="a-year" placeholder="年" min="1900" max="2024">
+      <input type="number" id="a-month" placeholder="月" min="1" max="12">
+      <input type="number" id="a-day" placeholder="日" min="1" max="31">
+    </div>
+    <div class="radio-row" style="margin-bottom:12px">
+      <label class="rl"><input type="radio" name="a-gender" value="m" checked> 男性</label>
+      <label class="rl"><input type="radio" name="a-gender" value="f"> 女性</label>
+    </div>
+    <p class="section-title">相手（Bさん）</p>
+    <div class="date-grid" style="margin-bottom:10px">
+      <input type="number" id="b-year" placeholder="年" min="1900" max="2024">
+      <input type="number" id="b-month" placeholder="月" min="1" max="12">
+      <input type="number" id="b-day" placeholder="日" min="1" max="31">
+    </div>
+    <div class="radio-row" style="margin-bottom:12px">
+      <label class="rl"><input type="radio" name="b-gender" value="m" checked> 男性</label>
+      <label class="rl"><input type="radio" name="b-gender" value="f"> 女性</label>
+    </div>
+    <button class="btn" onclick="calcCompat()">💕 相性を診断する</button>
+  </div>
+  <div id="compat-result" class="hidden">
+    <div class="card">
+      <h2>相性診断結果</h2>
+      <div class="compat-score">
+        <div class="score-ring" id="score-ring"></div>
+        <div class="score-label" id="score-label"></div>
+      </div>
+      <div class="compat-grid" id="compat-pillars"></div>
+      <hr class="divider">
+      <div id="compat-detail"></div>
+    </div>
+  </div>
+</div>
+</main>
+
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('meirei')"><span class="ic">☯</span>命式</button>
+  <button class="tab-btn" onclick="switchTab('kaisetsu')"><span class="ic">📜</span>解説</button>
+  <button class="tab-btn" onclick="switchTab('aisei')"><span class="ic">💕</span>相性</button>
+</nav>
+
+<script>
+const STEMS = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+const BRANCHES = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+const ELEMS = ['木','火','土','金','水'];
+const ELEM_COLORS = ['var(--wood)','var(--fire)','var(--earth)','var(--metal)','var(--water)'];
+const ELEM_BG = ['#1a3a10','#3a1010','#3a2010','#1e1e30','#0e2238'];
+const STEM_E = [0,0,1,1,2,2,3,3,4,4];
+const BRANCH_E = [4,2,0,0,2,1,1,2,3,3,2,4];
+const BRANCH_STEM = [8,5,0,1,4,2,3,5,6,7,4,8];
+const TERMS = [[0,6],[1,4],[2,6],[3,5],[4,6],[5,6],[6,7],[7,8],[8,8],[9,8],[10,7],[11,7]];
+const TERM_BRANCH = [1,2,3,4,5,6,7,8,9,10,11,0];
+const TERM_NAMES = ['小寒','立春','啓蟄','清明','立夏','芒種','小暑','立秋','白露','寒露','立冬','大雪'];
+const MONTH_STEM_BASE = [2,4,6,8,0,2,4,6,8,0];
+const SIX_HARM = [[0,1],[2,11],[3,10],[4,9],[5,8],[6,7]];
+const SIX_CLASH = [[0,6],[1,7],[2,8],[3,9],[4,10],[5,11]];
+const THREE_HARM = [[8,0,4],[2,6,10],[5,9,1],[11,3,7]];
+
+const DAY_PERSONALITY = [
+  {title:'甲木（きのえ）の人',text:'正直で真っ直ぐな木のような性格。高い理想と強いリーダーシップを持ち、困難にも立ち向かう不屈の精神があります。一方で頑固になりやすく、柔軟性を意識することが成長の鍵。'},
+  {title:'乙木（きのと）の人',text:'しなやかな草のような柔軟性が持ち味。人間関係を大切にし、空気を読む力に優れます。表面の穏やかさの裏に芯の強さを秘めており、じっくりと目標を達成していきます。'},
+  {title:'丙火（ひのえ）の人',text:'太陽のように明るく積極的なエネルギーの持ち主。人を引きつける魅力と行動力で、周囲を照らします。感情表現が豊かで、楽観的。ただし衝動的になりやすい面も。'},
+  {title:'丁火（ひのと）の人',text:'ろうそくの炎のような、繊細で温かみのある人柄。芸術的センスと細やかな気配りを兼ね備えます。直感力が高く、親密な人間関係を好みます。'},
+  {title:'戊土（つちのえ）の人',text:'大山のような安定感と包容力が特徴。信頼性が高く、周囲の人を守る大きな心を持ちます。忍耐力に優れ、長期的な視点で物事を捉えます。'},
+  {title:'己土（つちのと）の人',text:'大地のような堅実さと思慮深さが持ち味。細部に気を配り、計画的に物事を進める能力があります。人の世話が好きで、縁の下の力持ち的な存在。'},
+  {title:'庚金（かのえ）の人',text:'鋼鉄のような強い意志と決断力の持ち主。競争心旺盛で、目標に向かって一直線に突き進みます。正義感が強く、白黒はっきりつけたい性格。'},
+  {title:'辛金（かのと）の人',text:'磨かれた宝石のような繊細さと完璧主義。高い審美眼を持ち、品格と上品さを重んじます。傷つきやすいデリケートな面もありますが、内に強さを秘めています。'},
+  {title:'壬水（みずのえ）の人',text:'大海のように広い視野と知恵を持つ人。多才で順応力が高く、チャンスをつかむ嗅覚があります。自由を愛し、固定観念にとらわれない発想力が武器です。'},
+  {title:'癸水（みずのと）の人',text:'しみ込む雨水のように、深い直感力と洞察力の持ち主。内省的で神秘的な雰囲気をまとい、感受性が豊か。表面は静かでも、内側に豊かな感情世界を持ちます。'},
+];
+
+const ELEM_DESC = ['成長・発展・創造の力','情熱・社交・変化の力','安定・信頼・実直の力','意志・決断・完璧主義の力','知恵・流動性・直感の力'];
+
+const TENGOD_FORTUNE = {
+  '比肩':'独立心が高まる年。自分の力で道を切り開くチャンス。新しいことへの挑戦が吉。',
+  '劫財':'競争や変化が多い年。人間関係に注意しつつ、協力を活かすと良い結果が生まれます。',
+  '食神':'才能や表現力が開花する年。創造的な活動や趣味が運を引き寄せます。食福に恵まれやすい。',
+  '傷官':'変革と改革の年。既存の枠を超えたアイデアが生まれますが、言葉に注意が必要。',
+  '偏財':'財運に動きがある年。思わぬ収入や出会いがあるかも。行動力を発揮して。',
+  '正財':'堅実な財運の年。計画的な行動が実を結びます。地道な努力が報われやすい。',
+  '偏官':'試練と成長の年。プレッシャーがありますが、それを乗り越えることで大きく飛躍できます。',
+  '正官':'仕事運・評価が上がる年。責任ある立場になる機会が増えます。社会的な信用を積む好機。',
+  '偏印':'学びと内省の年。新しい知識やスキルを吸収しやすい時期。直感を大切にして。',
+  '正印':'精神的な充実の年。人からの支援を受けやすく、資格取得や学習に最適。',
+};
+
+function termDate(year, ti) {
+  const [m, d] = TERMS[ti];
+  return new Date(year, m, d);
+}
+
+function getYearPillar(date) {
+  let y = date.getFullYear();
+  const m = date.getMonth(), d = date.getDate();
+  if (m < 1 || (m === 1 && d < 4)) y--;
+  const stem = ((y - 4) % 10 + 10) % 10;
+  const branch = ((y - 4) % 12 + 12) % 12;
+  return { stem, branch, year: y };
+}
+
+function getMonthPillar(date, yearStem) {
+  const y = date.getFullYear();
+  const allTerms = [];
+  for (let yr = y - 1; yr <= y + 1; yr++) {
+    for (let ti = 0; ti < 12; ti++) {
+      allTerms.push({ date: termDate(yr, ti), ti, yr });
+    }
+  }
+  allTerms.sort((a, b) => a.date - b.date);
+  let cur = allTerms[0];
+  for (const t of allTerms) {
+    if (t.date <= date) cur = t;
+    else break;
+  }
+  const periodIdx = cur.ti;
+  const branch = TERM_BRANCH[periodIdx];
+  const monthOffset = (periodIdx - 1 + 12) % 12;
+  const stem = (MONTH_STEM_BASE[yearStem] + monthOffset) % 10;
+  return { stem, branch, termName: TERM_NAMES[periodIdx] };
+}
+
+function getDayPillar(date) {
+  const ref = new Date(2024, 0, 20);
+  const diff = Math.round((date - ref) / 86400000);
+  const ci = ((16 + diff) % 60 + 60) % 60;
+  return { stem: ci % 10, branch: ci % 12, ci };
+}
+
+function getHourPillar(hour, dayStem) {
+  let branch;
+  if (hour === 23) branch = 0;
+  else branch = Math.floor((hour + 1) / 2);
+  const hourStemBase = [0,2,4,6,8,0,2,4,6,8][dayStem];
+  const stem = (hourStemBase + branch) % 10;
+  return { stem, branch };
+}
+
+function getTenGod(dayStem, otherStem) {
+  const de = STEM_E[dayStem], oe = STEM_E[otherStem];
+  const sameYY = dayStem % 2 === otherStem % 2;
+  if (de === oe) return sameYY ? '比肩' : '劫財';
+  if ((de + 1) % 5 === oe) return sameYY ? '食神' : '傷官';
+  if ((de + 2) % 5 === oe) return sameYY ? '偏財' : '正財';
+  if ((oe + 2) % 5 === de) return sameYY ? '偏官' : '正官';
+  if ((oe + 1) % 5 === de) return sameYY ? '偏印' : '正印';
+  return '−';
+}
+
+function stemBranchToCI(s, b) {
+  for (let n = 0; n < 60; n++) if (n % 10 === s && n % 12 === b) return n;
+  return -1;
+}
+
+function countDaysTerm(birthDate, forward) {
+  const y = birthDate.getFullYear();
+  const candidates = [];
+  for (let yr = y - 1; yr <= y + 1; yr++) {
+    for (let ti = 1; ti < 12; ti++) {
+      candidates.push(termDate(yr, ti));
+    }
+  }
+  if (forward) {
+    const future = candidates.filter(d => d > birthDate).sort((a,b)=>a-b);
+    if (!future.length) return 90;
+    return Math.round((future[0] - birthDate) / 86400000);
+  } else {
+    const past = candidates.filter(d => d <= birthDate).sort((a,b)=>b-a);
+    if (!past.length) return 90;
+    return Math.round((birthDate - past[0]) / 86400000);
+  }
+}
+
+function getDaiyun(monthStem, monthBranch, isForward, startAge) {
+  const baseCI = stemBranchToCI(monthStem, monthBranch);
+  const result = [];
+  for (let i = 1; i <= 8; i++) {
+    const ci = isForward ? (baseCI + i) % 60 : ((baseCI - i) % 60 + 60) % 60;
+    result.push({ stem: ci % 10, branch: ci % 12, age: startAge + (i - 1) * 10 });
+  }
+  return result;
+}
+
+function calcFiveElems(pillars) {
+  const counts = [0,0,0,0,0];
+  for (const p of pillars) {
+    if (p.stem !== undefined) counts[STEM_E[p.stem]]++;
+    if (p.branch !== undefined) counts[BRANCH_E[p.branch]]++;
+  }
+  return counts;
+}
+
+let gResult = null;
+
+function calculate() {
+  const name = document.getElementById('name').value.trim();
+  const year = parseInt(document.getElementById('year').value);
+  const month = parseInt(document.getElementById('month').value);
+  const day = parseInt(document.getElementById('day').value);
+  const hourVal = document.getElementById('hour').value;
+  const hour = hourVal === '' ? null : parseInt(hourVal);
+  const gender = document.querySelector('input[name=gender]:checked').value;
+
+  if (!year || !month || !day || year < 1900 || year > 2030 || month < 1 || month > 12 || day < 1 || day > 31) {
+    alert('正しい生年月日を入力してください');
+    return;
+  }
+
+  const date = new Date(year, month - 1, day);
+  if (date.getMonth() !== month - 1) { alert('存在しない日付です'); return; }
+
+  const yp = getYearPillar(date);
+  const mp = getMonthPillar(date, yp.stem);
+  const dp = getDayPillar(date);
+  const hp = hour !== null ? getHourPillar(hour, dp.stem) : null;
+  const pillars = hp ? [yp, mp, dp, hp] : [yp, mp, dp];
+  const fiveE = calcFiveElems(pillars);
+  const yearYang = yp.stem % 2 === 0;
+  const isForward = (yearYang && gender === 'm') || (!yearYang && gender === 'f');
+  const daysToTerm = countDaysTerm(date, isForward);
+  const startAge = Math.max(1, Math.round(daysToTerm / 3));
+  const daiyun = getDaiyun(mp.stem, mp.branch, isForward, startAge);
+  const curYear = 2026;
+  const cyYp = getYearPillar(new Date(curYear, 5, 1));
+  const cyTenGod = getTenGod(dp.stem, cyYp.stem);
+
+  gResult = { name, date, yp, mp, dp, hp, pillars, fiveE, daiyun, startAge, isForward, gender, cyYp, cyTenGod };
+  renderResult(gResult);
+  renderKaisetsu(gResult);
+  document.getElementById('result').classList.remove('hidden');
+}
+
+function renderResult(r) {
+  const {name, yp, mp, dp, hp, fiveE, daiyun, startAge, isForward} = r;
+  document.getElementById('res-name').textContent = name ? `${name}の命式` : '命式表';
+
+  const allPillars = hp
+    ? [{label:'年柱',p:yp},{label:'月柱',p:mp},{label:'日柱（日主）',p:dp},{label:'時柱',p:hp}]
+    : [{label:'年柱',p:yp},{label:'月柱',p:mp},{label:'日柱（日主）',p:dp}];
+
+  const tgods = allPillars.map(({label,p}) => {
+    const isDay = label.startsWith('日柱');
+    const tg = isDay ? '日主' : getTenGod(dp.stem, p.stem);
+    return { label, p, tg, isDay };
+  });
+
+  let html = '';
+  if (!hp) html += `<div></div>`;
+  for (const {label, p, tg, isDay} of tgods) {
+    const se = STEM_E[p.stem];
+    const be = BRANCH_E[p.branch];
+    html += `<div class="pcol">
+      <div class="plabel">${label}</div>
+      <div class="pbox${isDay?' day-box':''}">
+        <span class="sten" style="color:${ELEM_COLORS[se]}">${STEMS[p.stem]}</span>
+        <span class="etag" style="background:${ELEM_BG[se]};color:${ELEM_COLORS[se]}">${ELEMS[se]}</span>
+        <span class="sbranch" style="color:${ELEM_COLORS[be]}">${BRANCHES[p.branch]}</span>
+        <span class="etag" style="background:${ELEM_BG[be]};color:${ELEM_COLORS[be]}">${ELEMS[be]}</span>
+        <span class="tgod${isDay?' tgod-self':''}">${tg}</span>
+      </div>
+    </div>`;
+  }
+  document.getElementById('pillars-table').innerHTML = html;
+  document.getElementById('solar-note').textContent = `年柱：${yp.year}年 ／ 月柱：${mp.termName}以降（節入り近似値）`;
+
+  const maxE = Math.max(...fiveE, 1);
+  let barsHtml = '';
+  for (let i = 0; i < 5; i++) {
+    const pct = Math.round(fiveE[i] / maxE * 100);
+    barsHtml += `<div class="ebar-row">
+      <div class="ename" style="color:${ELEM_COLORS[i]}">${ELEMS[i]}</div>
+      <div class="ebar-bg"><div class="ebar-fill" style="width:${pct}%;background:${ELEM_COLORS[i]}"></div></div>
+      <div class="ecount">${fiveE[i]}</div>
+    </div>`;
+  }
+  document.getElementById('elem-bars').innerHTML = barsHtml;
+
+  const maxIdx = fiveE.indexOf(Math.max(...fiveE));
+  const minIdx = fiveE.indexOf(Math.min(...fiveE));
+  document.getElementById('elem-comment').textContent =
+    `最も強い五行は「${ELEMS[maxIdx]}（${ELEM_DESC[maxIdx]}）」。最も弱いのは「${ELEMS[minIdx]}」です。`;
+
+  const dir = isForward ? '順行' : '逆行';
+  document.getElementById('daiyun-start').textContent = `大運は${startAge}歳から始まります（${dir}）`;
+  let dyHtml = '';
+  for (const dy of daiyun) {
+    const se = STEM_E[dy.stem], be = BRANCH_E[dy.branch];
+    dyHtml += `<div class="dy-item">
+      <div class="dy-age">${dy.age}歳〜</div>
+      <div class="dy-ks" style="color:${ELEM_COLORS[se]}">${STEMS[dy.stem]}</div>
+      <div class="dy-ks" style="color:${ELEM_COLORS[be]}">${BRANCHES[dy.branch]}</div>
+    </div>`;
+  }
+  document.getElementById('daiyun-list').innerHTML = dyHtml;
+}
+
+function renderKaisetsu(r) {
+  const {dp, yp, mp, fiveE, cyYp, cyTenGod} = r;
+  document.getElementById('kaisetsu-empty').classList.add('hidden');
+  document.getElementById('kaisetsu-content').classList.remove('hidden');
+
+  const pers = DAY_PERSONALITY[dp.stem];
+  document.getElementById('kai-daishuu').innerHTML =
+    `<h2>🌟 日主の特徴</h2>
+     <div class="fitem"><h3>${pers.title}</h3><p>${pers.text}</p></div>
+     <div class="fitem"><h3>五行の傾向</h3><p>${buildElemAnalysis(fiveE)}</p></div>`;
+
+  const tengods = buildTengodList(r);
+  document.getElementById('kai-gokyo').innerHTML =
+    `<h2>⚖ 十神（命式の構成）</h2>${tengods}
+     <p class="note">※ 日柱の天干（日主）を基準に他の干との関係を表します</p>`;
+
+  const fortuneText = TENGOD_FORTUNE[cyTenGod] || '変化の年。状況に応じた柔軟な対応を。';
+  document.getElementById('kai-nenun').innerHTML =
+    `<h2>📅 2026年（丙午年）の運勢</h2>
+     <div class="fitem"><h3>年干との関係：<span style="color:var(--gold)">${cyTenGod}</span></h3><p>${fortuneText}</p></div>
+     <div class="fitem"><h3>五行の動き</h3><p>2026年は丙火・午火の年。${buildYearElemText(dp.stem)}</p></div>
+     <p class="note">※ 大運・年支との複合的な判断が本格的な鑑定に必要です</p>`;
+}
+
+function buildElemAnalysis(fiveE) {
+  const maxIdx = fiveE.indexOf(Math.max(...fiveE));
+  const minIdx = fiveE.indexOf(Math.min(...fiveE));
+  let text = `命式全体では「${ELEMS[maxIdx]}」の気が最も強く（${fiveE[maxIdx]}個）、「${ELEMS[minIdx]}」が最も弱い（${fiveE[minIdx]}個）傾向があります。`;
+  if (fiveE[minIdx] === 0) text += `「${ELEMS[minIdx]}」の気を補う意識を持つと運気が安定します。`;
+  return text;
+}
+
+function buildTengodList(r) {
+  const {dp, yp, mp, hp} = r;
+  const rows = [
+    {label:'年柱 天干', s: yp.stem},
+    {label:'月柱 天干', s: mp.stem},
+    {label:'時柱 天干', s: hp ? hp.stem : null},
+  ].filter(x => x.s !== null);
+  let html = '';
+  for (const {label, s} of rows) {
+    const tg = getTenGod(dp.stem, s);
+    html += `<div class="fitem"><h3>${label}：${STEMS[s]}（${ELEMS[STEM_E[s]]}）→ <span style="color:var(--gold)">${tg}</span></h3><p>${getTengodDesc(tg)}</p></div>`;
+  }
+  return html;
+}
+
+function getTengodDesc(tg) {
+  const desc = {
+    '比肩':'独立心・自己主張。同じ性質を持つ。',
+    '劫財':'競争心・協働。自己を主張しながら他者と関わる力。',
+    '食神':'表現力・才能。自分の気を吐き出す創造のエネルギー。',
+    '傷官':'革新・批評力。枠を超えた発想と表現の力。',
+    '偏財':'行動力・財運。積極的に動くことで得られる富。',
+    '正財':'堅実・誠実。コツコツと築く安定した財。',
+    '偏官':'権力・克服。試練を超えて高みを目指す力。',
+    '正官':'秩序・評価。社会的責任と信頼を表す。',
+    '偏印':'直感・学習。偏った知識や師から学ぶ力。',
+    '正印':'包容・知恵。正当な教えや母性的な守りの力。',
+    '−':'特殊な関係。',
+  };
+  return desc[tg] || '';
+}
+
+function buildYearElemText(dayStem) {
+  const de = STEM_E[dayStem];
+  const fireE = 1;
+  if (de === fireE) return '日主と同じ火の気が強まります。情熱的な年ですが、過熱には注意。';
+  if ((de + 1) % 5 === fireE) return '日主が火を生む関係。自分のエネルギーを積極的に使う年。';
+  if ((de + 2) % 5 === fireE) return '日主が火を克す関係。財運が動く年。積極的な行動が吉。';
+  if ((fireE + 2) % 5 === de) return '火が日主を克す関係。プレッシャーがありますが、成長の機会です。';
+  if ((fireE + 1) % 5 === de) return '火が日主を生む関係。サポートや学びを受けやすい年。';
+  return '五行のバランスが変化します。柔軟な対応を心がけましょう。';
+}
+
+function calcCompat() {
+  const ay = parseInt(document.getElementById('a-year').value);
+  const am = parseInt(document.getElementById('a-month').value);
+  const ad = parseInt(document.getElementById('a-day').value);
+  const by = parseInt(document.getElementById('b-year').value);
+  const bm = parseInt(document.getElementById('b-month').value);
+  const bd = parseInt(document.getElementById('b-day').value);
+
+  if (!ay||!am||!ad||!by||!bm||!bd) { alert('両方の生年月日を入力してください'); return; }
+
+  const adateObj = new Date(ay, am-1, ad);
+  const bdateObj = new Date(by, bm-1, bd);
+  const ayp = getYearPillar(adateObj);
+  const amp = getMonthPillar(adateObj, ayp.stem);
+  const adp = getDayPillar(adateObj);
+  const byp = getYearPillar(bdateObj);
+  const bmp = getMonthPillar(bdateObj, byp.stem);
+  const bdp = getDayPillar(bdateObj);
+
+  let score = 50;
+  let details = [];
+
+  const ae = STEM_E[adp.stem];
+  const be = STEM_E[bdp.stem];
+  let elemRel = '';
+  if (ae === be) { score += 10; elemRel = `同じ${ELEMS[ae]}の気。互いを理解しやすい比和の関係です。`; }
+  else if ((ae + 1) % 5 === be) { score += 20; elemRel = `AさんがBさんを生かす相生の関係。AがBを自然にサポートする流れです。`; }
+  else if ((be + 1) % 5 === ae) { score += 20; elemRel = `BさんがAさんを生かす相生の関係。BがAをサポートします。`; }
+  else if ((ae + 2) % 5 === be) { score -= 10; elemRel = `AがBを克す相克の関係。刺激はありますが摩擦も生まれやすい。`; }
+  else if ((be + 2) % 5 === ae) { score -= 10; elemRel = `BがAを克す相克の関係。緊張感がある関係性です。`; }
+  details.push({title:'五行の相性', text:elemRel});
+
+  const aB = adp.branch, bB = bdp.branch;
+  let branchRel = '';
+  const isHarm = SIX_HARM.some(p => (p[0]===aB&&p[1]===bB)||(p[1]===aB&&p[0]===bB));
+  const isClash = SIX_CLASH.some(p => (p[0]===aB&&p[1]===bB)||(p[1]===aB&&p[0]===bB));
+  const isThree = THREE_HARM.some(g => g.includes(aB) && g.includes(bB));
+  if (isHarm) { score += 15; branchRel = `日支が六合（${BRANCHES[aB]}・${BRANCHES[bB]}）。自然に引き合う縁があります。`; }
+  else if (isThree) { score += 10; branchRel = `日支が三合の関係。共通の目標に向かいやすい組み合わせ。`; }
+  else if (isClash) { score -= 15; branchRel = `日支が六冲（${BRANCHES[aB]}・${BRANCHES[bB]}）。刺激的ですが衝突も起きやすい。`; }
+  else branchRel = `日支の関係は中性的。特別な引力も摩擦もない組み合わせです。`;
+  details.push({title:'日支の相性', text:branchRel});
+
+  const tg = getTenGod(adp.stem, bdp.stem);
+  details.push({title:'十神からの見方', text:`Aの日主から見てBは「${tg}」の関係。${getTengodCompatDesc(tg)}`});
+
+  score = Math.min(99, Math.max(1, score));
+  const stars = '★'.repeat(Math.round(score/20)) + '☆'.repeat(5-Math.round(score/20));
+  const label = score >= 80 ? '最高の相性！' : score >= 65 ? '良い相性' : score >= 50 ? '普通の相性' : '課題のある相性';
+
+  document.getElementById('score-ring').textContent = score;
+  document.getElementById('score-label').innerHTML = `<span class="stars">${stars}</span><br>${label}`;
+  document.getElementById('compat-pillars').innerHTML = `
+    <div class="compat-box"><div class="title">Aさんの日柱</div><div class="val" style="color:${ELEM_COLORS[STEM_E[adp.stem]]}">${STEMS[adp.stem]}${BRANCHES[adp.branch]}</div></div>
+    <div class="compat-box"><div class="title">Bさんの日柱</div><div class="val" style="color:${ELEM_COLORS[STEM_E[bdp.stem]]}">${STEMS[bdp.stem]}${BRANCHES[bdp.branch]}</div></div>`;
+
+  let detailHtml = '';
+  for (const d of details) {
+    detailHtml += `<div class="fitem"><h3>${d.title}</h3><p>${d.text}</p></div>`;
+  }
+  document.getElementById('compat-detail').innerHTML = detailHtml +
+    `<p class="note">※ 本格的な相性鑑定には大運・月運も含めた総合判断が必要です</p>`;
+  document.getElementById('compat-result').classList.remove('hidden');
+}
+
+function getTengodCompatDesc(tg) {
+  const d = {
+    '比肩':'同じ性質を持つ。対等な関係で理解し合いやすい。',
+    '劫財':'競争心が刺激される関係。切磋琢磨できるパートナー。',
+    '食神':'AがBに才能や魅力を感じる関係。A→B方向に愛情が流れやすい。',
+    '傷官':'Aの表現力がBに向かう。感情的な刺激がある関係。',
+    '偏財':'Aにとってのびのびできる財運的パートナー。',
+    '正財':'Aにとって安定した信頼できるパートナー。',
+    '偏官':'Bがプレッシャーを与える関係。刺激的で成長できる。',
+    '正官':'Bに守られ安定する関係。Bがリードしやすい。',
+    '偏印':'BがAを支え知恵を与える。精神的なつながりがある。',
+    '正印':'BがAを包む関係。母性的な保護と愛情のある絆。',
+    '−':'特殊な関係性。',
+  };
+  return d[tg] || '';
+}
+
+function switchTab(id) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    if (b.getAttribute('onclick').includes(`'${id}'`)) b.classList.add('active');
+  });
+}
+</script>
+</body>
+</html>
