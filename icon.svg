@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="45%" r="65%">
+      <stop offset="0%" stop-color="#1e0a50"/>
+      <stop offset="100%" stop-color="#07041a"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="35%" r="55%">
+      <stop offset="0%" stop-color="#5020b0" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#07041a" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="gshadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#c9a84c" flood-opacity="0.6"/>
+    </filter>
+    <filter id="pshadow" x="-30%" y="-10%" width="160%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="88" fill="url(#bg)"/>
+  <rect width="512" height="512" rx="88" fill="url(#glow)"/>
+
+  <!-- Stars -->
+  <circle cx="80"  cy="70"  r="1.8" fill="#c9a84c" opacity="0.7"/>
+  <circle cx="420" cy="55"  r="2.2" fill="#c9a84c" opacity="0.6"/>
+  <circle cx="460" cy="140" r="1.5" fill="#c9a84c" opacity="0.5"/>
+  <circle cx="55"  cy="200" r="1.5" fill="#c9a84c" opacity="0.5"/>
+  <circle cx="490" cy="320" r="1.8" fill="#c9a84c" opacity="0.4"/>
+  <circle cx="30"  cy="380" r="1.5" fill="#c9a84c" opacity="0.4"/>
+  <circle cx="200" cy="40"  r="1.2" fill="#c9a84c" opacity="0.5"/>
+  <circle cx="340" cy="35"  r="1.2" fill="#c9a84c" opacity="0.5"/>
+
+  <!-- Outer decorative ring -->
+  <circle cx="256" cy="195" r="168" fill="none" stroke="#c9a84c" stroke-width="1.5" opacity="0.35"/>
+  <circle cx="256" cy="195" r="176" fill="none" stroke="#c9a84c" stroke-width="0.8" opacity="0.2"/>
+
+  <!-- Eight trigram marks on ring -->
+  <g stroke="#c9a84c" stroke-width="1.5" opacity="0.4">
+    <line x1="256" y1="19" x2="256" y2="28"/>
+    <line x1="375" y1="76" x2="369" y2="84"/>
+    <line x1="424" y1="195" x2="415" y2="195"/>
+    <line x1="375" y1="314" x2="369" y2="306"/>
+    <line x1="256" y1="371" x2="256" y2="362"/>
+    <line x1="137" y1="314" x2="143" y2="306"/>
+    <line x1="88"  y1="195" x2="97"  y2="195"/>
+    <line x1="137" y1="76"  x2="143" y2="84"/>
+  </g>
+
+  <!-- Yin-Yang symbol -->
+  <g transform="translate(256,115)" filter="url(#gshadow)">
+    <circle r="52" fill="#0a0520" stroke="#c9a84c" stroke-width="2.5"/>
+    <!-- white half -->
+    <path d="M0,-52 A52,52 0 0,1 0,52 A26,26 0 0,1 0,0 A26,26 0 0,0 0,-52Z" fill="#e8d5b7"/>
+    <!-- small circles -->
+    <circle cx="0" cy="-26" r="10" fill="#0a0520"/>
+    <circle cx="0" cy="26"  r="10" fill="#e8d5b7"/>
+    <circle r="52" fill="none" stroke="#c9a84c" stroke-width="2"/>
+  </g>
+
+  <!-- Cloud decorations -->
+  <g opacity="0.5">
+    <ellipse cx="108" cy="308" rx="28" ry="11" fill="#c9a84c"/>
+    <ellipse cx="130" cy="302" rx="22" ry="9"  fill="#c9a84c"/>
+    <ellipse cx="90"  cy="308" rx="18" ry="8"  fill="#c9a84c"/>
+    <ellipse cx="404" cy="308" rx="28" ry="11" fill="#c9a84c"/>
+    <ellipse cx="382" cy="302" rx="22" ry="9"  fill="#c9a84c"/>
+    <ellipse cx="422" cy="308" rx="18" ry="8"  fill="#c9a84c"/>
+  </g>
+
+  <!-- ===== FOUR PILLARS ===== -->
+
+  <!-- 年柱 (Wood/Green) -->
+  <g transform="translate(74,178)" filter="url(#pshadow)">
+    <!-- roof -->
+    <polygon points="30,-18 66,2 -6,2" fill="#1e4a12" stroke="#56ab2f" stroke-width="1.5"/>
+    <polygon points="30,-10 58,2 2,2"  fill="#2a6018"/>
+    <!-- body -->
+    <rect x="2" y="2" width="56" height="128" rx="5" fill="#162e0e" stroke="#56ab2f" stroke-width="1.5"/>
+    <!-- inner glow -->
+    <rect x="8" y="10" width="44" height="60" rx="3" fill="#1a3a10" opacity="0.8"/>
+    <!-- character -->
+    <text x="30" y="65" text-anchor="middle" font-size="40" fill="#56ab2f" font-family="serif" font-weight="bold">年</text>
+    <line x1="8" y1="82" x2="52" y2="82" stroke="#56ab2f" stroke-width="1" opacity="0.4"/>
+    <text x="30" y="116" text-anchor="middle" font-size="15" fill="#56ab2f" opacity="0.8">木</text>
+  </g>
+
+  <!-- 月柱 (Fire/Red) -->
+  <g transform="translate(162,160)" filter="url(#pshadow)">
+    <polygon points="30,-18 66,2 -6,2" fill="#5a1a1a" stroke="#e74c3c" stroke-width="1.5"/>
+    <polygon points="30,-10 58,2 2,2"  fill="#3a1010"/>
+    <rect x="2" y="2" width="56" height="146" rx="5" fill="#280a0a" stroke="#e74c3c" stroke-width="1.5"/>
+    <rect x="8" y="10" width="44" height="70" rx="3" fill="#3a1010" opacity="0.8"/>
+    <text x="30" y="73" text-anchor="middle" font-size="40" fill="#e74c3c" font-family="serif" font-weight="bold">月</text>
+    <line x1="8" y1="92" x2="52" y2="92" stroke="#e74c3c" stroke-width="1" opacity="0.4"/>
+    <text x="30" y="132" text-anchor="middle" font-size="15" fill="#e74c3c" opacity="0.8">火</text>
+  </g>
+
+  <!-- 日柱 (Earth/Gold) — center tallest -->
+  <g transform="translate(250,150)" filter="url(#pshadow)">
+    <polygon points="30,-20 68,2 -8,2" fill="#6a4a08" stroke="#c9a84c" stroke-width="2"/>
+    <polygon points="30,-12 60,2 0,2"  fill="#4a3008"/>
+    <rect x="0" y="2" width="60" height="156" rx="5" fill="#2a1a04" stroke="#c9a84c" stroke-width="2"/>
+    <rect x="6" y="10" width="48" height="75" rx="3" fill="#3a2408" opacity="0.9"/>
+    <text x="30" y="78" text-anchor="middle" font-size="40" fill="#f0d080" font-family="serif" font-weight="bold">日</text>
+    <line x1="6" y1="100" x2="54" y2="100" stroke="#c9a84c" stroke-width="1.2" opacity="0.5"/>
+    <text x="30" y="140" text-anchor="middle" font-size="15" fill="#c9a84c" opacity="0.9">土</text>
+  </g>
+
+  <!-- 時柱 (Metal/Silver) -->
+  <g transform="translate(338,178)" filter="url(#pshadow)">
+    <polygon points="30,-18 66,2 -6,2" fill="#202040" stroke="#9b9db8" stroke-width="1.5"/>
+    <polygon points="30,-10 58,2 2,2"  fill="#141428"/>
+    <rect x="2" y="2" width="56" height="128" rx="5" fill="#0e0e22" stroke="#9b9db8" stroke-width="1.5"/>
+    <rect x="8" y="10" width="44" height="60" rx="3" fill="#1a1a30" opacity="0.8"/>
+    <text x="30" y="65" text-anchor="middle" font-size="40" fill="#9b9db8" font-family="serif" font-weight="bold">時</text>
+    <line x1="8" y1="82" x2="52" y2="82" stroke="#9b9db8" stroke-width="1" opacity="0.4"/>
+    <text x="30" y="116" text-anchor="middle" font-size="15" fill="#9b9db8" opacity="0.8">金</text>
+  </g>
+
+  <!-- Decorative base line -->
+  <rect x="68" y="307" width="376" height="3" rx="1.5" fill="#c9a84c" opacity="0.3"/>
+
+  <!-- Bottom text -->
+  <text x="256" y="368" text-anchor="middle" font-size="54" fill="#f0d080" font-family="serif" font-weight="bold" filter="url(#gshadow)">四柱推命</text>
+  <!-- Decorative lines around text -->
+  <line x1="68"  y1="383" x2="165" y2="383" stroke="#c9a84c" stroke-width="1.2" opacity="0.6"/>
+  <line x1="347" y1="383" x2="444" y2="383" stroke="#c9a84c" stroke-width="1.2" opacity="0.6"/>
+  <circle cx="256" cy="383" r="3" fill="#c9a84c" opacity="0.6"/>
+  <text x="256" y="422" text-anchor="middle" font-size="28" fill="#8070a8" font-family="serif" letter-spacing="10">運　勢</text>
+</svg>
