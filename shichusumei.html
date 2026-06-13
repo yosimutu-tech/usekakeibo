@@ -88,6 +88,22 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:14px 0}
 .stars{color:var(--gold)}
 .alert{background:#1a0a0a;border:1px solid var(--red);border-radius:8px;padding:10px;font-size:.8rem;color:#e88;margin-bottom:10px}
 .section-title{font-size:.85rem;color:var(--gold);margin:14px 0 8px;letter-spacing:.05em;border-left:3px solid var(--gold);padding-left:8px}
+/* share */
+.share-row{display:flex;gap:8px;margin-top:10px}
+.share-btn{flex:1;padding:10px 4px;border-radius:9px;border:none;font-size:.75rem;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;font-weight:700;transition:opacity .2s}
+.share-btn:hover{opacity:.8}
+.btn-x{background:#000;color:#fff}
+.btn-line{background:#06c755;color:#fff}
+.btn-copy{background:var(--card2);border:1px solid var(--border);color:var(--text)}
+/* love */
+.love-card{background:linear-gradient(135deg,#2a0a3a,#1a0628);border:1px solid #7b3295;border-radius:12px;padding:15px;margin-bottom:11px}
+.love-card h3{color:#f0a0ff;font-size:.9rem;margin-bottom:8px}
+.love-card p{font-size:.8rem;line-height:1.7;color:var(--text)}
+.love-tag{display:inline-block;padding:2px 9px;border-radius:10px;font-size:.68rem;font-weight:600;margin:2px 2px 6px 0;background:rgba(120,40,160,.45);border:1px solid #9b4dcc;color:#f0a0ff}
+.timing-box{background:rgba(80,15,100,.4);border:1px solid #8b3dbb;border-radius:9px;padding:11px;margin-bottom:8px}
+.timing-box h4{font-size:.8rem;color:#f0a0ff;margin-bottom:4px}
+.timing-box p{font-size:.75rem;color:var(--text);line-height:1.6}
+.highlight-box{border-color:#ff6bbd!important;background:rgba(150,20,100,.3)!important}
 </style>
 </head>
 <body>
@@ -146,8 +162,19 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:14px 0}
       <div class="daiyun-list" id="daiyun-list"></div>
     </div>
 
-    <div style="text-align:center;margin-bottom:16px">
-      <button class="btn btn-sm" onclick="switchTab('kaisetsu')">📜 詳しい解説を見る →</button>
+    <div style="text-align:center;margin-bottom:12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-sm" onclick="switchTab('kaisetsu')">📜 詳しい解説 →</button>
+      <button class="btn btn-sm" onclick="switchTab('renai')" style="background:linear-gradient(135deg,#7b1fa2,#4a0072)">💝 恋愛運 →</button>
+    </div>
+
+    <div class="card">
+      <h2>📤 命式をシェア</h2>
+      <p style="font-size:.75rem;color:var(--dim);margin-bottom:2px">友達にも診断を勧めよう✨</p>
+      <div class="share-row">
+        <button class="share-btn btn-x" onclick="shareX()">𝕏 ポスト</button>
+        <button class="share-btn btn-line" onclick="shareLINE()">LINE</button>
+        <button class="share-btn btn-copy" onclick="copyShare(this)">📋 コピー</button>
+      </div>
     </div>
   </div>
 </div>
@@ -205,12 +232,35 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:14px 0}
     </div>
   </div>
 </div>
+<!-- ===== TAB 4: 恋愛 ===== -->
+<div id="tab-renai" class="tab-panel">
+  <div id="renai-empty" class="card">
+    <p style="text-align:center;color:var(--dim);padding:20px 0;font-size:.9rem">
+      まず「命式」タブで生年月日を入力してください
+    </p>
+  </div>
+  <div id="renai-content" class="hidden">
+    <div class="card" id="ren-type"></div>
+    <div class="card" id="ren-fortune"></div>
+    <div class="card" id="ren-partner"></div>
+    <div class="card" id="ren-timing"></div>
+    <div class="card">
+      <h2>📤 恋愛運をシェア</h2>
+      <div class="share-row">
+        <button class="share-btn btn-x" onclick="shareX()">𝕏 ポスト</button>
+        <button class="share-btn btn-line" onclick="shareLINE()">LINE</button>
+        <button class="share-btn btn-copy" onclick="copyLoveShare(this)">📋 コピー</button>
+      </div>
+    </div>
+  </div>
+</div>
 </main>
 
 <nav class="tab-nav">
   <button class="tab-btn active" onclick="switchTab('meirei')"><span class="ic">☯</span>命式</button>
   <button class="tab-btn" onclick="switchTab('kaisetsu')"><span class="ic">📜</span>解説</button>
   <button class="tab-btn" onclick="switchTab('aisei')"><span class="ic">💕</span>相性</button>
+  <button class="tab-btn" onclick="switchTab('renai')"><span class="ic">💝</span>恋愛運</button>
 </nav>
 
 <script>
@@ -480,6 +530,7 @@ function calculate() {
 
   renderResult(gResult);
   renderKaisetsu(gResult);
+  renderRenai(gResult);
   document.getElementById('result').classList.remove('hidden');
 }
 
@@ -759,6 +810,178 @@ function getTengodCompatDesc(tg) {
     '−':'特殊な関係性。',
   };
   return d[tg] || '';
+}
+
+// ===== LOVE DATA =====
+const DAY_LOVE = [
+  {type:'一途な献身型',tags:['真剣交際','リード上手','誠実'],text:'恋愛は一途で真剣。好きになったら全力で愛します。リードするのが得意で、守ってあげたいという気持ちが強い。少し頑固な面があるため、相手の気持ちに耳を傾けることも大切です。'},
+  {type:'気配り上手な支え型',tags:['包み込む愛','空気を読む','じっくり育てる'],text:'感受性豊かで、相手の気持ちを察する能力が高い。じっくりと信頼関係を育てるタイプ。内面が深く、一度絆を結んだ相手をずっと支え続けます。'},
+  {type:'情熱的なアプローチ型',tags:['積極的','愛情豊か','明るいムード'],text:'好きになったらまっすぐにアプローチする情熱家。明るく社交的で、愛情表現がストレートです。一緒にいるだけで楽しい存在。長続きする深い絆を意識して。'},
+  {type:'繊細な深愛型',tags:['精神的つながり','細やかな愛情','内面重視'],text:'表面は穏やかでも、心の中では深く燃える愛情を持つ。精神的なつながりを最も大切にし、相手の内面を愛します。信頼できる相手を見極める眼力があります。'},
+  {type:'安定と包容の大黒柱型',tags:['包容力','安定した愛','長続きする絆'],text:'大きな安心感を与える包容力が魅力。じっくりと時間をかけて深い絆を築きます。将来を見据えた本物の愛情を求め、結婚後に特に輝くタイプです。'},
+  {type:'献身的な世話焼き型',tags:['尽くす愛情','家庭的','温かみ'],text:'愛する人のために尽くすことに喜びを感じるタイプ。家庭的で温かみがあり、日常の小さな愛情表現が得意。見返りを求めず与え続ける優しさが魅力です。'},
+  {type:'真っ直ぐな決断型',tags:['正直','スパッと決める','守護者'],text:'白黒はっきりしていて、好きなら好きと言える率直さが魅力。一度決めたら迷わない決断力で、相手を力強く守ります。行動で誠実さを示すタイプです。'},
+  {type:'高貴な理想主義型',tags:['高い審美眼','上品な愛','理想重視'],text:'理想の相手へのこだわりが強く、妥協しません。自分磨きに熱心で、洗練された相手を求めます。信頼した相手には深い愛情を見せる、本命に強いタイプ。'},
+  {type:'自由奔放な魅力発散型',tags:['多彩な魅力','ときめき重視','モテ体質'],text:'多彩な魅力で多くの人を引きつける天性のモテ体質。恋愛に自由と新鮮さを求めます。真剣な愛になるほど深く輝く。広い視野で相手を楽しませる才能があります。'},
+  {type:'神秘的な深愛型',tags:['直感的','精神的絆','神秘的魅力'],text:'外見は静かでも内側に豊かな感情世界を持ちます。直感で「この人だ」と感じた相手には深く真剣に向き合います。精神的な共鳴を最も大切にします。'},
+];
+
+const LOVE_2026 = [
+  '★食神の年★ 才能や魅力がどんどん輝く年。自分を表現する機会を増やすと素敵な出会いが生まれます。積極的な行動が恋愛運を開く鍵。',
+  '傷官の年。感情表現が豊かになり、恋愛に変化が訪れます。思い切って気持ちを伝えると、新しい扉が開きます。',
+  '比肩の年。似たもの同士との出会いが多い年。友人関係から発展する恋も。自分らしさを前面に出して。',
+  '劫財の年。恋愛に動きがある年。競争より協調を。自分の個性を磨くことで本命を引き寄せます。',
+  '偏印の年。内面を磨く修行の年。スキルアップや自己投資が将来の良縁を呼び込みます。趣味の場での出会いも。',
+  '正印の年。支え合える縁が深まる年。長期的な関係を育むのに最適。既存の関係がより深まりやすい時期。',
+  '偏官の年。刺激的な出会いがある年。試練を乗り越えた先に本物の愛が待っています。行動力を活かして。',
+  '★正官の年★ 恋愛・結婚に最高の運気！正式な交際やプロポーズのチャンスが訪れやすい特別な年です。積極的に行動して！',
+  '偏財の年。出会いのチャンスが増える年。行動力を活かして積極的に動くほど、良縁を引き寄せます。',
+  '正財の年。安定した愛情関係が深まる年。誠実な相手との縁が結ばれやすく、着実に関係が育ちます。',
+];
+
+const LOVE_ADVICE_2026 = [
+  '積極的に自分を表現する場に出ましょう。趣味の教室・SNS発信・友人の紹介が縁を呼び込みます。',
+  '気持ちをメッセージや言葉でしっかり伝えて。感情表現がチャンスを広げます。',
+  '共通の趣味・価値観を持つ仲間との出会いを大切に。友人の紹介も積極的に受けて。',
+  '自分らしさで本命を引き寄せます。背伸びせず、ありのままの魅力を磨いて。',
+  '外見・内面ともに磨く自己投資の年。美容・学習・旅行が将来の最高の縁を呼び込みます。',
+  '焦らず縁を育てる意識を。長く付き合えるパートナー探しに集中しましょう。',
+  '積極的に出会いに挑戦！初対面の印象より、深く知ることで真の相性がわかります。',
+  '今年が勝負！気になる相手がいれば勇気を出して一歩踏み出して。チャンスを逃さないで。',
+  '出会いの場にはどんどん顔を出して。行動量が多いほど良縁に近づきます。',
+  '誠実な姿勢で相手と向き合うことが深い関係への鍵。安定した場所での出会いを大切に。',
+];
+
+const IDEAL_PARTNER_DESC = [
+  '金の気を持つ相手（庚・辛年生まれ）と深い縁あり。正官として日主・甲を磨き、理想の関係を築けます。',
+  '金の気を持つ相手（庚・辛年生まれ）と好相性。乙の柔軟さと金の芯の強さが美しく補い合います。',
+  '水の気を持つ相手（壬・癸年生まれ）と好相性。情熱と知性が調和し、刺激的で深い絆が生まれます。',
+  '水の気を持つ相手（壬・癸年生まれ）と好相性。繊細な丁を深く理解してくれる、知的で包容力ある相手。',
+  '木の気を持つ相手（甲・乙年生まれ）と好相性。大地（戊）に木が根を張るイメージで、互いに成長できます。',
+  '木の気を持つ相手（甲・乙年生まれ）と好相性。世話好きな己をしっかり受け止めてくれる誠実な相手。',
+  '火の気を持つ相手（丙・丁年生まれ）と好相性。庚の鉄を情熱で溶かし形にする、熱い絆が生まれます。',
+  '火の気を持つ相手（丙・丁年生まれ）と好相性。宝石（辛）を磨いてくれる情熱ある相手が最高のパートナー。',
+  '土の気を持つ相手（戊・己年生まれ）と好相性。自由な水（壬）を受け止める器の大きな包容力ある相手。',
+  '土の気を持つ相手（戊・己年生まれ）と好相性。しみ込む雨（癸）を育む大地のような安定感のある相手。',
+];
+
+function renderRenai(r) {
+  if (!r) return;
+  const {dp, daiyun, startAge} = r;
+  document.getElementById('renai-empty').classList.add('hidden');
+  document.getElementById('renai-content').classList.remove('hidden');
+
+  const love = DAY_LOVE[dp.stem];
+  const fort2026 = LOVE_2026[dp.stem];
+  const isHighFort = fort2026.startsWith('★');
+
+  document.getElementById('ren-type').innerHTML =
+    `<h2>💝 あなたの恋愛タイプ</h2>
+     <div class="love-card">
+       <h3>♥ ${love.type}</h3>
+       ${love.tags.map(t=>`<span class="love-tag">${t}</span>`).join('')}
+       <p style="margin-top:8px">${love.text}</p>
+     </div>`;
+
+  document.getElementById('ren-fortune').innerHTML =
+    `<h2>💕 2026年の恋愛・結婚運</h2>
+     <div class="love-card${isHighFort?' highlight-box':''}">
+       <p>${fort2026}</p>
+     </div>
+     <div class="fitem">
+       <h3>今年のアドバイス</h3>
+       <p>${LOVE_ADVICE_2026[dp.stem]}</p>
+     </div>`;
+
+  const compatBranch = getCompatBranch(dp.branch);
+  document.getElementById('ren-partner').innerHTML =
+    `<h2>💑 理想のパートナー</h2>
+     <div class="love-card">
+       <h3>五行から見た相性</h3>
+       <p>${IDEAL_PARTNER_DESC[dp.stem]}</p>
+     </div>
+     <div class="fitem">
+       <h3>六合の縁（引き合う日支）</h3>
+       <p>${compatBranch}</p>
+     </div>`;
+
+  document.getElementById('ren-timing').innerHTML =
+    `<h2>⏰ 恋愛・結婚の好機</h2>
+     ${getMarriageTiming(daiyun)}
+     <p class="note">※ 大運を基にした目安です。月運・流年との組み合わせで詳細が変わります</p>`;
+}
+
+function getCompatBranch(branch) {
+  const pairs = [[0,1],[2,11],[3,10],[4,9],[5,8],[6,7]];
+  for (const [a,b] of pairs) {
+    if (branch === a) return `${BRANCHES[b]}年・${BRANCHES[b]}日生まれの方と六合の縁（${BRANCHES[a]}と${BRANCHES[b]}）。自然と引き合う、運命的な組み合わせです。`;
+    if (branch === b) return `${BRANCHES[a]}年・${BRANCHES[a]}日生まれの方と六合の縁（${BRANCHES[a]}と${BRANCHES[b]}）。自然と引き合う、運命的な組み合わせです。`;
+  }
+  return `${BRANCHES[branch]}との縁を大切に。三合・六合の相手との出会いを意識して。`;
+}
+
+function getMarriageTiming(daiyun) {
+  const peach = new Set([0,3,6,9]); // 桃花：子卯午酉
+  let html = '';
+  let shown = 0;
+  for (const dy of daiyun) {
+    if (shown >= 3) break;
+    const isPeach = peach.has(dy.branch);
+    const se = STEM_E[dy.stem];
+    if (isPeach || se === 1 || se === 3) {
+      const color = ELEM_COLORS[se];
+      html += `<div class="timing-box">
+        <h4>♥ ${dy.age}〜${dy.age+9}歳：<span style="color:${color}">${STEMS[dy.stem]}${BRANCHES[dy.branch]}</span>の大運</h4>
+        <p>${isPeach?'桃花の星が輝く期間。異性との縁が強まり、恋愛運が大きく高まります。':''}${se===1?'火の気が高まり、情熱的な出会いが生まれやすい時期。':''}${se===3?'金の気で縁が固まりやすい。正式な関係への進展が期待できます。':''}</p>
+      </div>`;
+      shown++;
+    }
+  }
+  if (!html && daiyun.length > 0) {
+    const dy = daiyun[0];
+    html = `<div class="timing-box">
+      <h4>${dy.age}〜${dy.age+9}歳：${STEMS[dy.stem]}${BRANCHES[dy.branch]}の大運</h4>
+      <p>この時期に出会いの場を積極的に広げることで、良い縁が生まれやすくなります。</p>
+    </div>`;
+  }
+  return html;
+}
+
+// ===== SHARE =====
+function generateShareText() {
+  if (!gResult) return '';
+  const {name, yp, mp, dp, hp} = gResult;
+  const n = name || 'わたし';
+  const love = DAY_LOVE[dp.stem];
+  return `🔮 ${n}の四柱推命\n年柱：${STEMS[yp.stem]}${BRANCHES[yp.branch]}　月柱：${STEMS[mp.stem]}${BRANCHES[mp.branch]}\n日柱：${STEMS[dp.stem]}${BRANCHES[dp.branch]}${hp?'　時柱：'+STEMS[hp.stem]+BRANCHES[hp.branch]:''}\n\n恋愛タイプは「${love.type}」💝\n\nあなたも診断してみて✨\nhttps://yosimutu-tech.github.io/usekakeibo/shichusumei.html\n#四柱推命 #恋愛占い #運命占い`;
+}
+
+function shareX() {
+  if (!gResult) { alert('まず命式を算出してください'); return; }
+  window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(generateShareText()), '_blank');
+}
+
+function shareLINE() {
+  if (!gResult) { alert('まず命式を算出してください'); return; }
+  window.open('https://line.me/R/msg/text/?' + encodeURIComponent(generateShareText()), '_blank');
+}
+
+function copyShare(btn) {
+  if (!gResult) { alert('まず命式を算出してください'); return; }
+  navigator.clipboard.writeText(generateShareText()).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓ コピー完了';
+    setTimeout(() => { btn.textContent = orig; }, 2000);
+  });
+}
+
+function copyLoveShare(btn) {
+  if (!gResult) { alert('まず命式を算出してください'); return; }
+  navigator.clipboard.writeText(generateShareText()).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓ コピー完了';
+    setTimeout(() => { btn.textContent = orig; }, 2000);
+  });
 }
 
 // ===== UI =====
