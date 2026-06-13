@@ -111,6 +111,18 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:14px 0}
 .timing-box h4{font-size:.8rem;color:#f0a0ff;margin-bottom:4px}
 .timing-box p{font-size:.75rem;color:var(--text);line-height:1.6}
 .highlight-box{border-color:#ff6bbd!important;background:rgba(150,20,100,.3)!important}
+/* monthly fortune */
+.mlist{display:flex;flex-direction:column;gap:8px;margin:8px 0}
+.mitem{background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:11px}
+.mitem-top{border-color:#f0a0ff;background:rgba(100,20,140,.25)}
+.mitem-peach{border-color:#ff6bbd}
+.mheader{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.mmonth{font-size:.88rem;font-weight:700;color:var(--gold-l)}
+.mpillar{font-size:1rem;font-weight:700}
+.mpeach{font-size:.62rem;padding:1px 6px;border-radius:8px;background:rgba(255,100,180,.2);border:1px solid #ff6bbd;color:#ff6bbd;margin-left:4px;vertical-align:middle}
+.mstars{font-size:.72rem;color:var(--gold);margin-bottom:4px}
+.mtext{font-size:.78rem;line-height:1.6;color:var(--text)}
+.mtip{font-size:.72rem;color:var(--dim);margin-top:4px}
 </style>
 </head>
 <body>
@@ -197,6 +209,7 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:14px 0}
     <div class="card" id="kai-daishuu"></div>
     <div class="card" id="kai-gokyo"></div>
     <div class="card" id="kai-nenun"></div>
+    <div class="card" id="kai-monthly"></div>
   </div>
 </div>
 
@@ -538,6 +551,7 @@ function calculate() {
   renderResult(gResult);
   renderKaisetsu(gResult);
   renderRenai(gResult);
+  renderMonthlyFortune(gResult);
   document.getElementById('result').classList.remove('hidden');
 }
 
@@ -955,6 +969,61 @@ function getMarriageTiming(daiyun) {
 }
 
 // ===== SHARE =====
+// ===== 2026後半 月運 =====
+const KOUHAN_2026 = [
+  {month:'7月', label:'小暑(7/7)〜', stem:1, branch:7},
+  {month:'8月', label:'立秋(8/8)〜', stem:2, branch:8},
+  {month:'9月', label:'白露(9/8)〜', stem:3, branch:9},
+  {month:'10月', label:'寒露(10/8)〜', stem:4, branch:10},
+  {month:'11月', label:'立冬(11/7)〜', stem:5, branch:11},
+  {month:'12月', label:'大雪(12/7)〜', stem:6, branch:0},
+];
+
+const MONTHLY_TG = {
+  '比肩':{s:3,love:'自分らしさが輝く月。似た価値観の人との縁が生まれやすい。',tip:'積極的な自己表現が吉。'},
+  '劫財':{s:2,love:'変化が多く感情の波が激しい月。相手を冷静に見極めて。',tip:'焦らず慎重な判断を。'},
+  '食神':{s:5,love:'魅力が自然に溢れる月！楽しい場での出会いが最高の縁に。',tip:'趣味・グルメの場に積極的に出て。'},
+  '傷官':{s:3,love:'感情豊かになる月。気持ちを伝えるなら今が好機。言葉は丁寧に。',tip:'メッセージや手紙での表現が吉。'},
+  '偏財':{s:4,love:'行動すればするほど縁が広がる月。出会いの場に顔を出して。',tip:'新しい場所・人との交流を増やして。'},
+  '正財':{s:4,love:'安定した縁が育つ月。誠実な相手との関係が深まりやすい。',tip:'焦らず着実に関係を育てて。'},
+  '偏官':{s:2,love:'試練の月。誤解や衝突に注意。乗り越えると絆が深まる。',tip:'自分の軸をしっかり持って。'},
+  '正官':{s:5,love:'★告白・プロポーズに最高の月★ 正式な関係への発展チャンス大！',tip:'勇気を出して気持ちを伝えて！'},
+  '偏印':{s:3,love:'直感が冴える月。ピンときた出会いを大切に。趣味・学びの場も吉。',tip:'直感を信じてすぐ行動を。'},
+  '正印':{s:4,love:'守られ安心できる月。信頼できる相手との縁が深まりやすい。',tip:'長期的な関係を意識して。'},
+  '−':{s:3,love:'変化の月。流れに乗りながら柔軟に対応を。',tip:'焦らず自然体で。'},
+};
+
+const PEACH_BRANCHES = new Set([0,3,6,9]); // 子卯午酉
+
+function renderMonthlyFortune(r) {
+  if (!r) return;
+  const {dp} = r;
+  let html = '';
+  for (const m of KOUHAN_2026) {
+    const tg = getTenGod(dp.stem, m.stem);
+    const info = MONTHLY_TG[tg] || MONTHLY_TG['−'];
+    const isPeach = PEACH_BRANCHES.has(m.branch);
+    const isTop = info.s >= 5;
+    const stars = '★'.repeat(info.s) + '☆'.repeat(5 - info.s);
+    const se = STEM_E[m.stem], be = BRANCH_E[m.branch];
+    html += `<div class="mitem${isTop?' mitem-top':''}${isPeach?' mitem-peach':''}">
+      <div class="mheader">
+        <span class="mmonth">${m.month}<small style="font-weight:400;margin-left:5px;color:var(--dim);font-size:.68rem">${m.label}</small></span>
+        <span><span class="mpillar" style="color:${ELEM_COLORS[se]}">${STEMS[m.stem]}</span><span class="mpillar" style="color:${ELEM_COLORS[be]}">${BRANCHES[m.branch]}</span>${isPeach?'<span class="mpeach">桃花</span>':''}</span>
+      </div>
+      <div class="mstars">${stars} <span style="color:var(--gold);font-size:.72rem">${tg}</span></div>
+      <p class="mtext">${info.love}</p>
+      <p class="mtip">💡 ${info.tip}</p>
+    </div>`;
+  }
+  document.getElementById('kai-monthly').innerHTML =
+    `<h2>🗓 2026年後半・月運（7〜12月）</h2>
+     <p style="font-size:.75rem;color:var(--dim);margin-bottom:10px">あなたの日主から見た各月の恋愛・運気の流れ</p>
+     <div class="mlist">${html}</div>
+     <p class="note">★5が最高運。桃花の月は異性との縁が特に強まります</p>
+     <p class="note">※ 節入り日は目安です。大運との組み合わせで詳細が変わります</p>`;
+}
+
 function generateShareText() {
   if (!gResult) return '';
   const {name, yp, mp, dp, hp} = gResult;
