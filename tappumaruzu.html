@@ -18,10 +18,32 @@ body{
   overflow-x:hidden;
 }
 
-/* Header */
+/* ===== おやすみ画面 ===== */
+.oyasumi-screen{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:linear-gradient(160deg,#0a0020,#1a0050,#000820);
+  z-index:999;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  text-align:center;
+  padding:30px;
+}
+.oyasumi-screen.show{display:flex}
+.oyasumi-moon{font-size:6rem;animation:moon-glow 3s ease-in-out infinite alternate}
+@keyframes moon-glow{from{transform:scale(1) rotate(-5deg)}to{transform:scale(1.08) rotate(5deg)}}
+.oyasumi-title{font-size:2rem;font-weight:900;color:#ffe8a0;margin:20px 0 10px;text-shadow:0 0 20px rgba(255,232,160,.5)}
+.oyasumi-sub{font-size:1.05rem;color:#b0a0e0;line-height:1.7}
+.stars-bg{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.star-dot{position:absolute;background:white;border-radius:50%;animation:twinkle 2s ease-in-out infinite alternate}
+@keyframes twinkle{from{opacity:.2}to{opacity:1}}
+
+/* ===== ヘッダー ===== */
 header{
   text-align:center;
-  padding:16px 16px 10px;
+  padding:14px 16px 8px;
   background:white;
   border-bottom:5px solid #ffb3d9;
   position:sticky;
@@ -30,7 +52,7 @@ header{
   box-shadow:0 3px 12px rgba(255,100,180,.15);
 }
 .title{
-  font-size:2.2rem;
+  font-size:2rem;
   font-weight:900;
   background:linear-gradient(135deg,#ff6ec7,#a855f7,#3b82f6);
   -webkit-background-clip:text;
@@ -38,37 +60,67 @@ header{
   background-clip:text;
   letter-spacing:.06em;
 }
-.score-box{
+.header-row{
   display:flex;
   justify-content:center;
-  gap:12px;
-  margin:10px 0 4px;
+  align-items:center;
+  gap:10px;
+  margin:8px 0 4px;
+  flex-wrap:wrap;
 }
 .score-item{
   background:#f5f8ff;
-  border-radius:16px;
-  padding:7px 18px;
+  border-radius:14px;
+  padding:5px 14px;
   text-align:center;
   border:3px solid #c7d8ff;
-  min-width:100px;
+  min-width:90px;
 }
-.score-label{font-size:.72rem;color:#999;font-weight:700}
-.score-val{font-size:1.9rem;font-weight:900;color:#3b82f6;line-height:1.1}
+.score-label{font-size:.68rem;color:#999;font-weight:700}
+.score-val{font-size:1.7rem;font-weight:900;color:#3b82f6;line-height:1.1}
 .score-val.green{color:#22c55e}
 
-/* Content */
-.content{padding:14px 14px 30px}
+/* タイマー */
+.timer-box{
+  background:#fff8e8;
+  border-radius:14px;
+  padding:5px 14px;
+  text-align:center;
+  border:3px solid #ffd080;
+  min-width:90px;
+}
+.timer-label{font-size:.68rem;color:#999;font-weight:700}
+.timer-val{font-size:1.7rem;font-weight:900;color:#f59e0b;line-height:1.1}
+.timer-val.warn{color:#ef4444;animation:blink .5s step-start infinite}
+@keyframes blink{50%{opacity:.3}}
 
-/* Start button */
+/* タイマーバー */
+.timer-bar-wrap{
+  height:8px;
+  background:#f0f0f0;
+  border-radius:4px;
+  margin:4px 2px 0;
+  overflow:hidden;
+}
+.timer-bar{
+  height:100%;
+  background:linear-gradient(90deg,#4ade80,#fbbf24,#ef4444);
+  border-radius:4px;
+  transition:width 1s linear;
+}
+
+/* コンテンツ */
+.content{padding:12px 14px 30px}
+
 .start-btn{
   display:block;
   width:100%;
-  padding:18px;
+  padding:17px;
   background:linear-gradient(135deg,#4ade80,#22c55e);
   border:none;
   border-radius:22px;
   color:white;
-  font-size:1.55rem;
+  font-size:1.5rem;
   font-weight:900;
   cursor:pointer;
   margin-bottom:14px;
@@ -79,7 +131,7 @@ header{
 }
 .start-btn:active{transform:translateY(5px);box-shadow:0 1px 0 #16a34a}
 
-/* Game area */
+/* ゲームエリア */
 .game-area{
   background:linear-gradient(180deg,#e4f3fc,#d8ecf8);
   border-radius:26px;
@@ -91,7 +143,7 @@ header{
   box-shadow:inset 0 3px 12px rgba(144,202,249,.3);
 }
 
-/* Animals */
+/* 動物 */
 .animal{
   position:absolute;
   font-size:88px;
@@ -109,7 +161,6 @@ header{
   transition:transform .12s;
 }
 .animal:active{transform:scale(1.25)}
-
 @keyframes pop-out{
   0%{transform:scale(1);opacity:1}
   35%{transform:scale(1.6);opacity:1}
@@ -120,18 +171,18 @@ header{
   pointer-events:none;
 }
 
-/* Instructions */
+/* 遊び方 */
 .instructions{
   background:white;
   border-radius:18px;
-  padding:14px 16px;
-  margin-top:14px;
+  padding:13px 16px;
+  margin-top:13px;
   border:3px solid #f0e8ff;
 }
 .instructions p{
-  font-size:.9rem;
+  font-size:.88rem;
   color:#666;
-  margin-bottom:7px;
+  margin-bottom:6px;
   display:flex;
   align-items:flex-start;
   gap:8px;
@@ -139,8 +190,8 @@ header{
 }
 .instructions p:last-child{margin-bottom:0}
 
-/* Clear overlay */
-.clear-overlay{
+/* ===== クリア画面 ===== */
+.overlay{
   display:none;
   position:fixed;
   inset:0;
@@ -149,60 +200,55 @@ header{
   align-items:center;
   justify-content:center;
 }
-.clear-overlay.show{display:flex}
+.overlay.show{display:flex}
 
-.clear-box{
+.result-box{
   background:white;
   border-radius:32px;
-  padding:40px 28px;
+  padding:38px 26px;
   text-align:center;
-  max-width:310px;
+  max-width:300px;
   width:88%;
-  border:6px solid #ffd700;
-  box-shadow:0 0 50px rgba(255,215,0,.6);
   position:relative;
   z-index:201;
 }
-.clear-emoji{font-size:5rem;display:block;margin-bottom:14px;animation:bounce-em 0.6s ease infinite alternate}
-@keyframes bounce-em{from{transform:scale(1)}to{transform:scale(1.15)}}
-.clear-title{font-size:2.2rem;font-weight:900;color:#ff6ec7;margin-bottom:6px}
-.clear-sub{font-size:1.05rem;color:#888;margin-bottom:26px;line-height:1.5}
+.result-box.clear{border:6px solid #ffd700;box-shadow:0 0 50px rgba(255,215,0,.6)}
+.result-box.end{border:6px solid #a78bfa;box-shadow:0 0 40px rgba(167,139,250,.4)}
 
-.retry-btn{
-  background:linear-gradient(135deg,#f97316,#ef4444);
-  color:white;
+.result-emoji{font-size:4.5rem;display:block;margin-bottom:12px}
+.result-emoji.bounce{animation:bounce-em .6s ease infinite alternate}
+@keyframes bounce-em{from{transform:scale(1)}to{transform:scale(1.12)}}
+
+.result-title{font-size:2rem;font-weight:900;margin-bottom:6px}
+.result-title.pink{color:#ff6ec7}
+.result-title.purple{color:#7c3aed}
+.result-sub{font-size:1rem;color:#888;margin-bottom:24px;line-height:1.6}
+.result-score-big{font-size:2.4rem;font-weight:900;color:#3b82f6;margin:8px 0}
+
+.action-btn{
+  display:block;
+  width:100%;
   border:none;
   border-radius:18px;
-  padding:15px 38px;
-  font-size:1.3rem;
+  padding:14px;
+  font-size:1.2rem;
   font-weight:900;
   cursor:pointer;
   font-family:inherit;
-  box-shadow:0 5px 0 #b91c1c;
-  transition:transform .1s,box-shadow .1s;
+  margin-bottom:10px;
 }
-.retry-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #b91c1c}
+.btn-retry{
+  background:linear-gradient(135deg,#f97316,#ef4444);
+  color:white;
+  box-shadow:0 4px 0 #b91c1c;
+}
+.btn-retry:active{transform:translateY(3px);box-shadow:0 1px 0 #b91c1c}
+.btn-end{background:#f3f4f6;color:#888;box-shadow:0 3px 0 #d1d5db;font-size:1rem}
 
-/* Stars decoration */
-.stars-deco{
-  position:absolute;
-  top:0;left:0;right:0;
-  pointer-events:none;
-  overflow:hidden;
-  height:60px;
-}
-.star{
-  position:absolute;
-  font-size:1.4rem;
-  animation:star-float 2s ease-in-out infinite alternate;
-}
-@keyframes star-float{from{transform:translateY(0)}to{transform:translateY(-8px)}}
-
-/* Confetti */
+/* 紙吹雪 */
 .confetti-piece{
   position:fixed;
-  width:11px;
-  height:11px;
+  width:11px;height:11px;
   border-radius:2px;
   z-index:300;
   pointer-events:none;
@@ -215,59 +261,158 @@ header{
 </head>
 <body>
 
+<!-- おやすみ画面 -->
+<div class="oyasumi-screen" id="oyasumi-screen">
+  <div class="stars-bg" id="stars-bg"></div>
+  <div class="oyasumi-moon">🌙</div>
+  <div class="oyasumi-title">もう おやすみの<br>じかんだよ</div>
+  <div class="oyasumi-sub" style="margin-top:16px">
+    あそべる じかんは<br>
+    <strong style="color:#ffe8a0">あさ 7じ 〜 よる 9じ</strong><br><br>
+    また あした あそぼうね！⭐
+  </div>
+</div>
+
 <header>
   <div class="title">🐾 タップマルズ</div>
-  <div class="score-box">
+  <div class="header-row">
     <div class="score-item">
       <div class="score-label">🐾 みつけた</div>
       <div class="score-val" id="score">0</div>
     </div>
     <div class="score-item">
       <div class="score-label">ぜんぶで</div>
-      <div class="score-val green" id="target">10</div>
+      <div class="score-val green">10</div>
     </div>
+    <div class="timer-box">
+      <div class="timer-label">⏱ のこり</div>
+      <div class="timer-val" id="timer-val">3:00</div>
+    </div>
+  </div>
+  <div class="timer-bar-wrap">
+    <div class="timer-bar" id="timer-bar" style="width:100%"></div>
   </div>
 </header>
 
 <div class="content">
   <button class="start-btn" id="start-btn" onclick="startGame()">🎮 はじめる！</button>
-
   <div class="game-area" id="game-area"></div>
-
-  <div class="instructions" id="instructions">
+  <div class="instructions">
     <p>🐾 どうぶつを タップすると てんすうが はいるよ！</p>
     <p>📱 スクロールして ぜんぶ みつけてね</p>
-    <p>🔄 もういちどボタンで やりなおせるよ</p>
+    <p>⏱ 3ぷん で おしまいだよ</p>
   </div>
 </div>
 
-<!-- Clear screen -->
-<div class="clear-overlay" id="clear-overlay">
-  <div class="clear-box">
-    <span class="clear-emoji">🎉</span>
-    <div class="clear-title">やったー！</div>
-    <div class="clear-sub">ぜんぶ みつけたよ！<br>すごい すごい！</div>
-    <button class="retry-btn" onclick="resetGame()">🔄 もういちど</button>
+<!-- クリア画面 -->
+<div class="overlay" id="clear-overlay">
+  <div class="result-box clear">
+    <span class="result-emoji bounce">🎉</span>
+    <div class="result-title pink">やったー！</div>
+    <div class="result-sub">ぜんぶ みつけたよ！<br>すごい すごい！</div>
+    <button class="action-btn btn-retry" onclick="resetGame()">🔄 もういちど</button>
+  </div>
+</div>
+
+<!-- 時間切れ画面 -->
+<div class="overlay" id="end-overlay">
+  <div class="result-box end">
+    <span class="result-emoji">😊</span>
+    <div class="result-title purple">じかん きれだよ！</div>
+    <div class="result-sub">
+      <span id="end-score-text">みつけた：0 こ</span><br>
+      またあした あそぼうね！
+    </div>
+    <button class="action-btn btn-retry" onclick="resetGame()">🔄 もういちど</button>
   </div>
 </div>
 
 <script>
 const ANIMALS = ['🐰','🐱','🐒','🐸','🐧'];
 const TOTAL = 10;
-let score = 0;
+const GAME_TIME = 180; // 3分
+const PLAY_START = 7;  // 7時
+const PLAY_END = 21;   // 21時
 
+let score = 0;
+let timerInterval = null;
+let secondsLeft = GAME_TIME;
+let gameRunning = false;
+
+// ===== 時間制限チェック =====
+function checkTime() {
+  const h = new Date().getHours();
+  if (h < PLAY_START || h >= PLAY_END) {
+    showOyasumi();
+  }
+}
+
+function showOyasumi() {
+  // 星を生成
+  const bg = document.getElementById('stars-bg');
+  bg.innerHTML = '';
+  for (let i = 0; i < 40; i++) {
+    const s = document.createElement('div');
+    s.className = 'star-dot';
+    const sz = 1 + Math.random() * 3;
+    s.style.cssText = `
+      width:${sz}px;height:${sz}px;
+      left:${Math.random()*100}%;
+      top:${Math.random()*100}%;
+      animation-duration:${1.5+Math.random()*2}s;
+      animation-delay:${Math.random()*2}s;
+    `;
+    bg.appendChild(s);
+  }
+  document.getElementById('oyasumi-screen').classList.add('show');
+}
+
+// ===== ゲーム =====
 function startGame() {
   score = 0;
+  secondsLeft = GAME_TIME;
+  gameRunning = true;
   document.getElementById('score').textContent = '0';
   document.getElementById('start-btn').textContent = '🔄 もういちど';
+  updateTimerDisplay();
+  clearInterval(timerInterval);
+  timerInterval = setInterval(tickTimer, 1000);
   placeAnimals();
 }
 
 function resetGame() {
   document.getElementById('clear-overlay').classList.remove('show');
+  document.getElementById('end-overlay').classList.remove('show');
   startGame();
 }
 
+// ===== タイマー =====
+function tickTimer() {
+  secondsLeft--;
+  updateTimerDisplay();
+  if (secondsLeft <= 0) {
+    gameOver();
+  }
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(secondsLeft / 60);
+  const s = secondsLeft % 60;
+  const val = document.getElementById('timer-val');
+  val.textContent = `${m}:${String(s).padStart(2,'0')}`;
+  val.className = 'timer-val' + (secondsLeft <= 30 ? ' warn' : '');
+  const pct = (secondsLeft / GAME_TIME) * 100;
+  document.getElementById('timer-bar').style.width = pct + '%';
+}
+
+function gameOver() {
+  clearInterval(timerInterval);
+  gameRunning = false;
+  document.getElementById('end-score-text').textContent = `みつけた：${score} こ`;
+  document.getElementById('end-overlay').classList.add('show');
+}
+
+// ===== 動物配置 =====
 function placeAnimals() {
   const area = document.getElementById('game-area');
   area.innerHTML = '';
@@ -278,7 +423,6 @@ function placeAnimals() {
   const margin = 16;
   const placed = [];
 
-  // 2 of each animal, shuffled
   const list = [];
   for (let i = 0; i < TOTAL; i++) list.push(ANIMALS[i % ANIMALS.length]);
   list.sort(() => Math.random() - .5);
@@ -307,7 +451,7 @@ function placeAnimals() {
 }
 
 function tapAnimal(el) {
-  if (el.classList.contains('popping')) return;
+  if (!gameRunning || el.classList.contains('popping')) return;
   el.classList.add('popping');
   score++;
   document.getElementById('score').textContent = score;
@@ -318,6 +462,8 @@ function tapAnimal(el) {
 }
 
 function showClear() {
+  clearInterval(timerInterval);
+  gameRunning = false;
   document.getElementById('clear-overlay').classList.add('show');
   launchConfetti();
 }
@@ -331,8 +477,7 @@ function launchConfetti() {
       el.className = 'confetti-piece';
       el.style.cssText = `
         background:${COLORS[Math.floor(Math.random()*COLORS.length)]};
-        left:${Math.random()*100}vw;
-        top:-30px;
+        left:${Math.random()*100}vw;top:-30px;
         border-radius:${Math.random()>.5?'50%':'2px'};
         animation:confetti-fall ${1.4+Math.random()*1.8}s ease-in forwards;
       `;
@@ -341,6 +486,11 @@ function launchConfetti() {
     }, i * 28);
   }
 }
+
+// 起動時に時間チェック
+checkTime();
+// 1分ごとに再チェック（日をまたいだ場合など）
+setInterval(checkTime, 60000);
 </script>
 </body>
 </html>
