@@ -33,7 +33,6 @@ body{
 }
 .oyasumi-screen.show{display:flex}
 
-/* おやすみカード */
 .oyasumi-card{
   width:100%;
   max-width:340px;
@@ -43,7 +42,6 @@ body{
   margin-bottom:28px;
 }
 
-/* カード内：夜空 */
 .card-sky{
   background:linear-gradient(180deg,#1a3a6a 0%,#1e4880 50%,#1a3a6a 100%);
   padding:20px 20px 0;
@@ -62,10 +60,15 @@ body{
 @keyframes heart-beat{from{transform:scale(1)}to{transform:scale(1.15)}}
 @keyframes cloud-drift{from{transform:translateX(0)}to{transform:translateX(6px)}}
 
-.bunny-wrap{position:relative;z-index:2;width:220px;height:130px;margin:0 auto -10px;animation:float-cloud 3s ease-in-out infinite alternate;}
+.bunny-wrap{
+  position:relative;
+  z-index:2;
+  width:260px;
+  height:150px;
+  margin:0 auto -14px;
+  animation:float-cloud 3s ease-in-out infinite alternate;
+}
 @keyframes float-cloud{from{transform:translateY(0)}to{transform:translateY(-8px)}}
-.bunny-cloud{position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:9rem;line-height:1;filter:brightness(1.9) saturate(0.15);}
-.bunny-emoji{position:absolute;bottom:38px;left:50%;transform:translateX(-50%);font-size:4.2rem;line-height:1;}
 
 .mountains{position:absolute;bottom:0;left:0;right:0;height:80px;overflow:hidden;}
 .mt1{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:0;border-left:90px solid transparent;border-right:90px solid transparent;border-bottom:100px solid #1a4a25;}
@@ -115,9 +118,7 @@ header{text-align:center;padding:14px 16px 8px;background:white;border-bottom:5p
 /* ========== 時間切れカード ========== */
 .end-card{background:white;border-radius:28px;max-width:320px;width:90%;overflow:hidden;box-shadow:0 6px 30px rgba(0,0,0,.35);z-index:201;}
 .end-sky{background:linear-gradient(180deg,#1a3a6a,#1e4880);padding:18px 18px 0;position:relative;min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;}
-.end-bunny-wrap{position:relative;width:200px;height:120px;margin:0 auto -8px;animation:float-cloud 3s ease-in-out infinite alternate}
-.end-bunny{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);font-size:3.8rem;line-height:1}
-.end-bunny-cloud{position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:8rem;line-height:1;filter:brightness(1.9) saturate(.15)}
+.end-bunny-wrap{position:relative;width:220px;height:130px;margin:0 auto -8px;animation:float-cloud 3s ease-in-out infinite alternate}
 .end-grass{background:linear-gradient(180deg,#1d5a28,#1a5025);padding:12px 16px 16px;text-align:center}
 .end-grass-text{color:white;font-size:1.05rem;font-weight:900;line-height:1.7;text-shadow:0 1px 4px rgba(0,0,0,.4);margin-bottom:12px}
 .end-bottom{padding:20px 20px 22px;text-align:center;background:white}
@@ -147,9 +148,41 @@ header{text-align:center;padding:14px 16px 8px;background:white;border-bottom:5p
         <div class="mt1"></div>
         <div class="mt2"></div>
       </div>
+      <!-- 寝ているうさぎ（SVG） -->
       <div class="bunny-wrap">
-        <span class="bunny-cloud">☁️</span>
-        <span class="bunny-emoji">🐰</span>
+        <svg viewBox="0 0 240 140" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+          <!-- 雲 -->
+          <ellipse cx="120" cy="122" rx="90" ry="20" fill="#c8e4f4"/>
+          <circle cx="68" cy="110" r="24" fill="#d4eaf6"/>
+          <circle cx="98" cy="101" r="29" fill="#d4eaf6"/>
+          <circle cx="134" cy="104" r="26" fill="#d4eaf6"/>
+          <circle cx="164" cy="111" r="21" fill="#d4eaf6"/>
+          <ellipse cx="120" cy="124" rx="90" ry="16" fill="#daeefa"/>
+          <!-- 体 -->
+          <ellipse cx="108" cy="90" rx="52" ry="24" fill="#f8f2e0"/>
+          <!-- しっぽ -->
+          <circle cx="58" cy="86" r="14" fill="white"/>
+          <!-- 頭 -->
+          <circle cx="163" cy="76" r="28" fill="#f8f2e0"/>
+          <!-- 左耳 -->
+          <ellipse cx="148" cy="36" rx="9" ry="27" fill="#f8f2e0" transform="rotate(-7,148,36)"/>
+          <ellipse cx="148" cy="36" rx="5" ry="20" fill="#f5b8b8" transform="rotate(-7,148,36)"/>
+          <!-- 右耳 -->
+          <ellipse cx="173" cy="33" rx="9" ry="27" fill="#f8f2e0" transform="rotate(7,173,33)"/>
+          <ellipse cx="173" cy="33" rx="5" ry="20" fill="#f5b8b8" transform="rotate(7,173,33)"/>
+          <!-- 目（閉じて笑顔） -->
+          <path d="M150 74 Q155 69 160 74" stroke="#8b7355" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M165 74 Q170 69 175 74" stroke="#8b7355" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <!-- 鼻 -->
+          <ellipse cx="163" cy="82" rx="4" ry="3" fill="#e89090"/>
+          <!-- ほっぺ -->
+          <circle cx="150" cy="85" r="8" fill="#f5a0a0" opacity="0.4"/>
+          <circle cx="176" cy="85" r="8" fill="#f5a0a0" opacity="0.4"/>
+          <!-- 口 -->
+          <path d="M160 85 Q163 89 166 85" stroke="#c08080" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <!-- 前足 -->
+          <ellipse cx="138" cy="107" rx="18" ry="9" fill="#f0e8d0"/>
+        </svg>
       </div>
       <div class="card-trees">🌲🌲</div>
     </div>
@@ -207,9 +240,30 @@ header{text-align:center;padding:14px 16px 8px;background:white;border-bottom:5p
         <div class="mt1"></div>
         <div class="mt2"></div>
       </div>
+      <!-- 終了画面もSVGうさぎ（小さめ） -->
       <div class="end-bunny-wrap">
-        <span class="end-bunny-cloud">☁️</span>
-        <span class="end-bunny">🐼</span>
+        <svg viewBox="0 0 240 140" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+          <ellipse cx="120" cy="122" rx="90" ry="20" fill="#c8e4f4"/>
+          <circle cx="68" cy="110" r="24" fill="#d4eaf6"/>
+          <circle cx="98" cy="101" r="29" fill="#d4eaf6"/>
+          <circle cx="134" cy="104" r="26" fill="#d4eaf6"/>
+          <circle cx="164" cy="111" r="21" fill="#d4eaf6"/>
+          <ellipse cx="120" cy="124" rx="90" ry="16" fill="#daeefa"/>
+          <ellipse cx="108" cy="90" rx="52" ry="24" fill="#f8f2e0"/>
+          <circle cx="58" cy="86" r="14" fill="white"/>
+          <circle cx="163" cy="76" r="28" fill="#f8f2e0"/>
+          <ellipse cx="148" cy="36" rx="9" ry="27" fill="#f8f2e0" transform="rotate(-7,148,36)"/>
+          <ellipse cx="148" cy="36" rx="5" ry="20" fill="#f5b8b8" transform="rotate(-7,148,36)"/>
+          <ellipse cx="173" cy="33" rx="9" ry="27" fill="#f8f2e0" transform="rotate(7,173,33)"/>
+          <ellipse cx="173" cy="33" rx="5" ry="20" fill="#f5b8b8" transform="rotate(7,173,33)"/>
+          <path d="M150 74 Q155 69 160 74" stroke="#8b7355" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M165 74 Q170 69 175 74" stroke="#8b7355" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <ellipse cx="163" cy="82" rx="4" ry="3" fill="#e89090"/>
+          <circle cx="150" cy="85" r="8" fill="#f5a0a0" opacity="0.4"/>
+          <circle cx="176" cy="85" r="8" fill="#f5a0a0" opacity="0.4"/>
+          <path d="M160 85 Q163 89 166 85" stroke="#c08080" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <ellipse cx="138" cy="107" rx="18" ry="9" fill="#f0e8d0"/>
+        </svg>
       </div>
     </div>
     <div class="end-grass">
