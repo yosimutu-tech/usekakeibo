@@ -247,29 +247,9 @@ header{
 }
 .instructions p:last-child{margin-bottom:0}
 
-/* ========== クリア画面 ========== */
-.overlay{
-  display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,.6);z-index:200;
-  align-items:center;justify-content:center;
-}
+/* ========== オーバーレイ ========== */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center}
 .overlay.show{display:flex}
-.clear-box{
-  background:white;border-radius:32px;padding:38px 26px;
-  text-align:center;max-width:300px;width:88%;
-  border:6px solid #ffd700;box-shadow:0 0 50px rgba(255,215,0,.6);z-index:201;
-}
-.clear-emoji{font-size:4.5rem;display:block;margin-bottom:12px;animation:bounce-em .6s ease infinite alternate}
-@keyframes bounce-em{from{transform:scale(1)}to{transform:scale(1.12)}}
-.clear-title{font-size:2rem;font-weight:900;color:#ff6ec7;margin-bottom:6px}
-.clear-sub{font-size:1rem;color:#888;margin-bottom:22px;line-height:1.6}
-.retry-btn{
-  display:block;width:100%;border:none;border-radius:18px;padding:14px;
-  font-size:1.2rem;font-weight:900;cursor:pointer;font-family:inherit;
-  background:linear-gradient(135deg,#f97316,#ef4444);
-  color:white;box-shadow:0 4px 0 #b91c1c;
-}
-.retry-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #b91c1c}
 
 /* ========== 時間切れカード ========== */
 .end-card{
@@ -300,12 +280,6 @@ header{
 }
 .end-retry:active{transform:translateY(3px);box-shadow:0 1px 0 #1d4ed8}
 
-/* 紙吹雪 */
-.confetti-piece{position:fixed;width:11px;height:11px;border-radius:2px;z-index:300;pointer-events:none}
-@keyframes confetti-fall{
-  0%{transform:translateY(-30px) rotate(0deg) scale(1);opacity:1}
-  100%{transform:translateY(105vh) rotate(780deg) scale(.5);opacity:0}
-}
 </style>
 </head>
 <body>
@@ -357,12 +331,8 @@ header{
   <div class="title">🐾 タップマルズ</div>
   <div class="header-row">
     <div class="score-item">
-      <div class="score-label">🐾 みつけた</div>
+      <div class="score-label">🐾 スコア</div>
       <div class="score-val" id="score">0</div>
-    </div>
-    <div class="score-item">
-      <div class="score-label">ぜんぶで</div>
-      <div class="score-val green">10</div>
     </div>
     <div class="timer-box">
       <div class="timer-label">⏱ のこり</div>
@@ -379,18 +349,9 @@ header{
   <div class="game-area" id="game-area"></div>
   <div class="instructions">
     <p>🐾 どうぶつを タップすると てんすうが はいるよ！</p>
-    <p>📱 スクロールして ぜんぶ みつけてね</p>
+    <p>📱 スクロールして どうぶつを さがしてね</p>
+    <p>🐾 タップしたら あたらしい どうぶつが でてくるよ</p>
     <p>⏱ 3ぷん で おしまいだよ</p>
-  </div>
-</div>
-
-<!-- ========== クリア画面 ========== -->
-<div class="overlay" id="clear-overlay">
-  <div class="clear-box">
-    <span class="clear-emoji">🎉</span>
-    <div class="clear-title">やったー！</div>
-    <div class="clear-sub">ぜんぶ みつけたよ！<br>すごい すごい！</div>
-    <button class="retry-btn" onclick="resetGame()">🔄 もういちど</button>
   </div>
 </div>
 
@@ -424,15 +385,15 @@ header{
     </div>
     <div class="end-bottom">
       <div class="end-title">おしまいだよ</div>
-      <div class="end-sub">みつけた：<span id="end-score">0</span> こ<br>またあした あそぼうね！</div>
+      <div class="end-sub">スコア：<span id="end-score">0</span> てん<br>またあした あそぼうね！</div>
       <button class="end-retry" onclick="resetGameEnd()">🔄 もういちど</button>
     </div>
   </div>
 </div>
 
 <script>
-const ANIMALS = ['🐰','🐱','🐒','🐸','🐧'];
-const TOTAL = 10;
+const ANIMALS = ['😺','🐶','🐰','🐵','🐸','🐼','🐧'];
+const TOTAL = 12;
 const GAME_TIME = 180;
 const PLAY_START = 7;
 const PLAY_END = 21;
@@ -456,11 +417,6 @@ function startGame() {
   clearInterval(timerInterval);
   timerInterval = setInterval(tickTimer, 1000);
   placeAnimals();
-}
-
-function resetGame() {
-  document.getElementById('clear-overlay').classList.remove('show');
-  startGame();
 }
 
 function resetGameEnd() {
@@ -520,28 +476,33 @@ function placeAnimals() {
 function tapAnimal(el) {
   if (!gameRunning || el.classList.contains('popping')) return;
   el.classList.add('popping');
-  score++;
+  score += 10;
   document.getElementById('score').textContent = score;
-  setTimeout(() => { el.remove(); if (score >= TOTAL) showClear(); }, 420);
+  setTimeout(() => { el.remove(); spawnAnimal(); }, 420);
 }
 
-function showClear() {
-  clearInterval(timerInterval); gameRunning = false;
-  document.getElementById('clear-overlay').classList.add('show');
-  launchConfetti();
-}
-
-const COLORS = ['#ff6ec7','#ffd700','#4ade80','#60a5fa','#f97316','#a855f7','#f43f5e','#06b6d4'];
-function launchConfetti() {
-  for (let i = 0; i < 70; i++) {
-    setTimeout(() => {
-      const el = document.createElement('div');
-      el.className = 'confetti-piece';
-      el.style.cssText = `background:${COLORS[Math.floor(Math.random()*COLORS.length)]};left:${Math.random()*100}vw;top:-30px;border-radius:${Math.random()>.5?'50%':'2px'};animation:confetti-fall ${1.4+Math.random()*1.8}s ease-in forwards;`;
-      document.body.appendChild(el);
-      setTimeout(() => el.remove(), 3200);
-    }, i * 28);
+function spawnAnimal() {
+  if (!gameRunning) return;
+  const area = document.getElementById('game-area');
+  const areaW = area.clientWidth || 440, areaH = 1500, size = 128, margin = 16;
+  const existing = Array.from(area.querySelectorAll('.animal')).map(e => ({x: parseFloat(e.style.left), y: parseFloat(e.style.top)}));
+  let x, y, ok = false, attempts = 0;
+  while (!ok && attempts < 300) {
+    x = margin + Math.random() * (areaW - size - margin * 2);
+    y = margin + Math.random() * (areaH - size - margin * 2);
+    ok = existing.every(p => Math.abs(p.x - x) > size + 8 || Math.abs(p.y - y) > size + 8);
+    attempts++;
   }
+  const emoji = ANIMALS[Math.floor(Math.random() * ANIMALS.length)];
+  const el = document.createElement('div');
+  el.className = 'animal';
+  el.textContent = emoji;
+  el.style.left = x + 'px';
+  el.style.top = y + 'px';
+  const tap = () => tapAnimal(el);
+  el.addEventListener('click', tap);
+  el.addEventListener('touchend', e => { e.preventDefault(); tap(); });
+  area.appendChild(el);
 }
 
 checkTime();
